@@ -120,7 +120,7 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Split image
-        img_to_pub = img[30:40;:]
+        img_to_pub = img[30:40,:]
         # Publish mask for inspection and tuning of the above interval and framerate
         self.publishMask(img_to_pub)
 
