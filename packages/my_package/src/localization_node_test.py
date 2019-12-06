@@ -174,7 +174,7 @@ class LocalizationNode(DTROS):
                                 self.publishCmd(turn_cmd)
                                 rospy.loginfo('Continue to StateEstimator after first AT')
 
-                                #time.sleep(5)
+                                time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
                                 self.state = True
@@ -200,7 +200,7 @@ class LocalizationNode(DTROS):
                                 self.publishCmd(turn_cmd)
                                 rospy.loginfo('Continue to StateEstimator')
 
-                                #time.sleep(5)
+                                time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
                                 self.state = True

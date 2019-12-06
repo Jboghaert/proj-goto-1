@@ -52,7 +52,7 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
-        self.pub_mask_compressed = rospy.Publisher('/%s/state_estimation/image_compressed' %self.veh_name, CompressedImage, queue_size = 1)
+        self.pub_mask_compressed = rospy.Publisher('/%s/state_estimation/image_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -120,12 +120,12 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Split image
-        #imgTOP = np.sum(img[41:480,:]==255)
-        imgUSED = np.sum(img[30:40,:]==255) #255?
+        img_to_pub = img[30:40;:]
         # Publish mask for inspection and tuning of the above interval and framerate
-        self.publishMask(imgUSED)
-        #imgBOTTOM
-        return imgUSED
+        self.publishMask(img_to_pub)
+
+        img_crop = np.sum(img[30:40,:]==255) #255?
+        return img_crop
 
 
     def blobCounter(self, img):
