@@ -61,8 +61,8 @@ class StateEstimator(DTROS):
 
         # WARNING: only update image here (else all camera feed for all nodes is of low quality)
         # Ensure optimal computation, rescale image
-        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
-        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
+        #rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
+        #rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # Create timer to update params of camera_node
@@ -111,7 +111,7 @@ class StateEstimator(DTROS):
     def imageSplitter(self, img):
         # Split image
         #imgBOTTOM = np.sum(img[:149,:]==255)
-        imgTOP = np.sum(img[150:160,:]==255) #255?
+        imgTOP = np.sum(img[590:640,:]==255) #255?
         return imgTOP
 
 

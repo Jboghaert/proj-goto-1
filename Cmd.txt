@@ -65,7 +65,7 @@ To see rqt graph (check if all connections are made):
     $ dts start_gui_tools maserati4pgts 
     $ rostopic list
     $ rqt_graph
-    $ rqt image_view
+    $ rqt_image_view
 
 
 Start indefinite_navigation via joystick keyboard_control
