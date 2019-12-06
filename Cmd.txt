@@ -1,0 +1,69 @@
+#This is a template file for terminal commands (i.e. a guideline to reproduce results)
+#Change default name of maserati4pgts to your DUCKIEBOT_NAME
+
+
+#General info:
+Vars:
+    goal_input: [AT id of type int32, distance in cm from 2nd last AT of type int32]
+        Define as a list or array in .launch file with param type "array"
+        Follow this definition protocol: http://wiki.ros.org/rospy/Overview/Parameter%20Server and https://docs.python.org/2/library/xmlrpclib.html
+        Also: https://www.clearpathrobotics.com/assets/guides/ros/ROS%20Parameter%20Server.html and https://answers.ros.org/question/206146/arrays-ros-launch-file/
+
+    starting_point: AT id of type int32 from msg type AprilTagsWithInfos
+        Derived from the incoming msg of type AprilTagsWithInfos from the subscribed topic apriltags_prostprocessing
+
+
+#Terminal commands:
+Preparation:
+    $ ping maserati4pgts.local
+
+    # Update the main images required for implementation
+    $ docker -H maserati4pgts.local pull duckietown/dt-car-interface:daffy
+    $ docker -H maserati4pgts.local pull duckietown/dt-duckiebot-interface:daffy
+    $ docker -H maserati4pgts.local pull duckietown/dt-core:daffy
+
+
+Build ind_nav demo without random_april_tag_turns_node:
+    # Make sure all old containers from the images dt-core, dt-duckiebot-interface, dt-car-interface are stopped (using portainer)
+    # Access portainer using "maserati4pgts.local:9000/#/containers"
+    $ dts duckiebot demo --demo_name all_drivers --duckiebot_name maserati4pgts --package_name duckiebot_interface --image duckietown/dt-duckiebot-interface:daffy
+    $ dts duckiebot demo --demo_name all --duckiebot_name maserati4pgts --package_name car_interface --image duckietown/dt-car-interface:daffy
+    # Do NOT use default cmd for indefinite_navigation: dts duckiebot demo --demo_name indefinite_navigation --duckiebot_name maserati4pgts --package_name duckietown_demos --image duckietown/dt-core:daffy
+    $ docker -H maserati4pgts.local run -it --name dt-core-goto1 -v /data:/data --privileged --rm --net host duckietown/dt-core:daffy /bin/bash
+
+    Within /bin/bash install vim (texteditor) and exclude random_april_tag_turns_node through:
+    $ apt-get update
+    $ apt-get install vim
+    $ ls
+    # go to the .launch files directory /code/catkin_ws/src/dt-core/packages/duckietown_demos/launch using the cd /path cmd
+    $ vim indefinite_navigation.launch
+    # edit the file by putting value of apriltags_random to "false" by pressing "i" to insert/change the file once opened
+    # use ":q!" and enter to exit without saving, and ":w" or ":wq" for saving the file: see also https://linuxize.com/post/how-to-save-file-in-vim-quit-editor/
+    # then (inside the root) type the edited version of the launch.sh file:
+    $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
+    # WARNING: the edited indefinite_navigation is now running, leave this running at all times
+    # you will see an overview of all parameters, but wait about 5 minutes until everything is running (see also portainer log)
+
+
+Run test module (subset of goto-1 solution) in another terminal window:
+    $ dts devel watchtower stop -H maserati4pgts.local
+    $ chmod +x ./packages/my_package/src/localization_node_test.py
+    $ dts devel build -f --arch arm32v7 -H maserati4pgts.local
+    # Delete ROBOT_IP and PC_IP, replace IMAGE_NAME:IMAGE_TAG with retrieved image name
+    $ docker -H maserati4pgts.local run -it --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP=192.168.1.116:11311/ -e ROS_IP=PC_IP=192.168.1.95 --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
+
+    Within /bin/bash run the following (if not, default value will be used as defined in localization_node_test.launch):
+    $ roslaunch my_package localization_node_test.launch goal_input:="63" goal_distance:="40" robot_name:="maserati4pgts"
+
+
+To see rqt graph (check if all connections are made):
+    $ dts start_gui_tools maserati4pgts 
+    $ rostopic list
+    $ rqt_graph
+
+
+Start indefinite_navigation via joystick keyboard_control
+    $ dts duckiebot keyboard_control maserati4pgts
+    # or
+    $ dts duckiebot keyboard_control maserati4pgts --base_image duckietown/dt-core:daffy-amd64
+
