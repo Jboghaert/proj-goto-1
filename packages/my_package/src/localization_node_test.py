@@ -99,7 +99,7 @@ class LocalizationNode(DTROS):
             rospy.loginfo('You have reached your destination')
             #stop StateEstimator
             self.estimation = False
-            self.pub_state_estimator.publish(self.estimation)
+            self.publishTrigger(self.estimation)
             #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
             #self.onShutdown()
@@ -175,7 +175,7 @@ class LocalizationNode(DTROS):
 
                                 #time.sleep(5)
                                 self.estimation = True
-                                self.pub_state_estimator.publish(self.estimation)
+                                self.publishTrigger(self.estimation)
 
 
                             else: # Stop immediately
@@ -200,7 +200,7 @@ class LocalizationNode(DTROS):
 
                                 #time.sleep(5)
                                 self.estimation = True
-                                self.pub_state_estimator.publish(self.estimation)
+                                self.publishTrigger(self.estimation)
 
 
                             else: # Stop immediately
@@ -301,6 +301,12 @@ class LocalizationNode(DTROS):
         self.path.pop(0)
         self.cmd.pop(0)
         rospy.loginfo('Updated remaining path and cmd')
+
+
+    def publishTrigger(self, bool):
+        triggerCmd = BoolStamped()
+        triggerCmd.data = bool
+        self.pub_state_estimator.publish(triggerCmd)
 
 
 # REACHING FINAL POINT

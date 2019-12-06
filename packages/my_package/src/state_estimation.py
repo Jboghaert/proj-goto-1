@@ -61,6 +61,7 @@ class StateEstimator(DTROS):
 # CODE GOES HERE
 
     def cbLocalization(self, msg):
+        # Keep this true, independent from new message
         self.estimator = True
 
 
