@@ -157,16 +157,22 @@ class StateEstimator(DTROS):
             self.go = True
 
 
-    def publishMask(self, img):
-        msg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
-        msg.data = self.bridge.cv2_to_compressed_imgmsg(img)
-        self.pub_mask_compressed.publish(msg)
+    def publishMask(self, mask):
+        # bring back to BGR
+        mask = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
+        # set up message type
+        maskmsg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
+        maskmsg.data = self.bridge.cv2_to_compressed_imgmsg(mask)
+        self.pub_mask_compressed.publish(maskmsg)
 
 
-    def publishCrop(self, img):
-        msg = CompressedImage()
-        msg.data = self.bridge.cv2_to_compressed_imgmsg(img)
-        self.pub_crop_compressed.publish(msg)
+    def publishCrop(self, crop):
+        # bring back to BGR
+        crop = cv2.cvtColor(crop, cv2.COLOR_HSV2BGR)
+        # set up message type
+        cropmsg = CompressedImage()
+        cropmsg.data = self.bridge.cv2_to_compressed_imgmsg(crop)
+        self.pub_crop_compressed.publish(cropmsg)
 
 
 # SAFETY & EMERGENCY
