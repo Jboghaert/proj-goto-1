@@ -68,7 +68,7 @@ class LocalizationNode(DTROS):
         self.graph = self.pp.graph
 
         # Adjustment for indefinite navigation
-        rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.9)
+        rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.5) #trim value to desired velocity
 
         # List subscribers
         self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback) #from apriltags_postprocessing_node
@@ -84,7 +84,7 @@ class LocalizationNode(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        self.rate = rospy.Rate(15)
+        self.rate = rospy.Rate(20)
 
 
 # CODE GOES HERE
