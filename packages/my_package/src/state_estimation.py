@@ -158,13 +158,14 @@ class StateEstimator(DTROS):
 
 
     def publishMask(self, img):
-        #msg = CompressedImage()
-        msg = self.bridge.cv2_to_compressed_imgmsg(img)
+        msg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
+        msg.data = self.bridge.cv2_to_compressed_imgmsg(img)
         self.pub_mask_compressed.publish(msg)
 
 
     def publishCrop(self, img):
-        msg = self.bridge.cv2_to_compressed_imgmsg(img)
+        msg = CompressedImage()
+        msg.data = self.bridge.cv2_to_compressed_imgmsg(img)
         self.pub_crop_compressed.publish(msg)
 
 
