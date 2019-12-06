@@ -52,7 +52,8 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
-        self.pub_mask_compressed = rospy.Publisher('/%s/state_estimation/image_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_mask_compressed = rospy.Publisher('~/%s/state_estimation/mask_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_crop_compressed = rospy.Publisher('~/%s/state_estimation/crop_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -115,14 +116,15 @@ class StateEstimator(DTROS):
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
         # Output yellow/black image only
         result = cv2.bitwise_and(imgHSV, imgHSV, mask = mask_yellow)
+        self.publishMask(result)
         return result
 
 
     def imageSplitter(self, img):
         # Split image
         img_to_pub = img[30:40,:]
-        # Publish mask for inspection and tuning of the above interval and framerate
-        self.publishMask(img_to_pub)
+        # Publish cropped mask for inspection and tuning of the above interval and framerate
+        self.publishCrop(img_to_pub)
 
         img_crop = np.sum(img[30:40,:]==255) #255?
         return img_crop
@@ -159,6 +161,11 @@ class StateEstimator(DTROS):
         #msg = CompressedImage()
         msg = self.bridge.cv2_to_compressed_imgmsg(img)
         self.pub_mask_compressed.publish(msg)
+
+
+    def publishCrop(self, img):
+        msg = self.bridge.cv2_to_compressed_imgmsg(img)
+        self.pub_crop_compressed.publish(msg)
 
 
 # SAFETY & EMERGENCY
