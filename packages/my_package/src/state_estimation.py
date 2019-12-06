@@ -103,8 +103,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = [20, 180, 150]
-        upper_yellow = [40, 255, 255]
+        lower_yellow = np.array([20, 180, 150], np.uint8)
+        upper_yellow = np.array([40, 255, 255], np.uint8)
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
         # Output yellow/black image only
         result = cv2.bitwise_and(imgHSV, imgHSV, mask = mask_yellow)
