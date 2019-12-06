@@ -52,6 +52,7 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
+        self.pub_mask_compressed = rospy.Publisher('/%s/state_estimation/image_compressed' %self.veh_name, CompressedImage, queue_size = 1)
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -121,6 +122,8 @@ class StateEstimator(DTROS):
         # Split image
         #imgTOP = np.sum(img[41:480,:]==255)
         imgUSED = np.sum(img[30:40,:]==255) #255?
+        # Publish mask for inspection and tuning of the above interval and framerate
+        self.publishMask(imgUSED)
         #imgBOTTOM
         return imgUSED
 
@@ -150,6 +153,12 @@ class StateEstimator(DTROS):
             # As soon as image is not fully black anymore, start counting
             rospy.loginfo('Done #3.2')
             self.go = True
+
+
+    def publishMask(self, img):
+        #msg = CompressedImage()
+        msg = self.bridge.cv2_to_compressed_imgmsg(img)
+        self.pub_mask_compressed.publish(msg)
 
 
 # SAFETY & EMERGENCY
