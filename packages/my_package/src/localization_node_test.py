@@ -73,24 +73,25 @@ class LocalizationNode(DTROS):
         # List subscribers
         self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback) #from apriltags_postprocessing_node
         self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
-        self.sub_state_estimator = rospy.Subscriber('/%s/state_estimation/state' %self.veh_name, Int16, self.cbState)
+        self.sub_state_estimator = rospy.Subscriber('/%s/state_estimation/state' % self.veh_name, Int16, self.cbState)
 
         # List publishers
         self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
         self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
         self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
         #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
-        self.pub_state_estimator = rospy.Publisher('/%s/localization_node_test/estimator_trigger' %self.veh_name, BoolStamped, queue_size = 1)
+        self.pub_state_estimator = rospy.Publisher('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(15)
 
 
 # CODE GOES HERE
     def cbState(self, msg):
         # Upon incoming msg, stop main callback by setting self.state = True
         self.state = True
+        rospy.loginfo('We reached now %s stripes, out of XX' %msg)
 
         # Permanently subscribe to avoid AT cb during state_estimator from beginning, not only when final goal was reached
         if msg == self.goal_discrete: #unnecessary, is already true if there is an incoming message --> change to
@@ -176,6 +177,7 @@ class LocalizationNode(DTROS):
                                 #time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
+                                self.state = True
 
 
                             else: # Stop immediately
@@ -201,6 +203,7 @@ class LocalizationNode(DTROS):
                                 #time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
+                                self.state = True
 
 
                             else: # Stop immediately

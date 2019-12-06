@@ -33,7 +33,8 @@ class StateEstimator(DTROS):
         self.node_name = "state_estimation"
         self.veh_name = "maserati4pgts"
         self.number = 0
-        self.estimator = False # don't start this node unless 'go' from localization_node
+        self.estimator = False # don't start this node unless 'True' from localization_node
+        self.go = False
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -41,7 +42,7 @@ class StateEstimator(DTROS):
         # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 10.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 5.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
@@ -54,7 +55,7 @@ class StateEstimator(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(15)
         self.bridge = CvBridge()
 
 
@@ -83,9 +84,9 @@ class StateEstimator(DTROS):
             # Extract necessary image part
             img = self.imageSplitter(img)
             # Count number of blobs (= midline stripes)
-            self.number = self.blobCounter(img)
+            self.blobCounter(img)
             # Stop when threshold is reached
-            return self.number
+            #return self.number
 
         else:
             pass
@@ -115,9 +116,10 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Split image
-        #imgBOTTOM = np.sum(img[:149,:]==255)
-        imgTOP = np.sum(img[590:640,:]==255) #255?
-        return imgTOP
+        #imgTOP = np.sum(img[11:480,:]==255)
+        imgUSED = np.sum(img[0:10,:]==255) #255?
+        #imgBOTTOM
+        return imgUSED
 
 
     def blobCounter(self, img):
@@ -127,6 +129,7 @@ class StateEstimator(DTROS):
         # If not black (= yellow)
         if self.current != 0: # For robustness, increase threshold if self.current > some_value:
             # Only count when discontinuity was encountered, and yellow is again True
+            rospy.loginfo('Encountered fully black image from mask')
             if self.go == True:
                 self.number = self.number + 1
                 # Do not come back, unless fully black image (=line discontinuity) is encountered
