@@ -2,7 +2,7 @@
 #Change default name of maserati4pgts to your DUCKIEBOT_NAME
 
 
-#General info:
+## General info:
 Vars:
     goal_input: [AT id of type int32, distance in cm from 2nd last AT of type int32]
         Define as a list or array in .launch file with param type "array"
@@ -13,7 +13,7 @@ Vars:
         Derived from the incoming msg of type AprilTagsWithInfos from the subscribed topic apriltags_prostprocessing
 
 
-#Terminal commands:
+## Terminal commands:
 Preparation:
     $ ping maserati4pgts.local
 
@@ -35,10 +35,12 @@ Build ind_nav demo without random_april_tag_turns_node:
     $ apt-get update
     $ apt-get install vim
     $ ls
+
     # go to the .launch files directory /code/catkin_ws/src/dt-core/packages/duckietown_demos/launch using the cd /path cmd
     $ vim indefinite_navigation.launch
     # edit the file by putting value of apriltags_random to "false" by pressing "i" to insert/change the file once opened
     # use ":q!" and enter to exit without saving, and ":w" or ":wq" for saving the file: see also https://linuxize.com/post/how-to-save-file-in-vim-quit-editor/
+
     # then (inside the root) type the edited version of the launch.sh file:
     $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
     # WARNING: the edited indefinite_navigation is now running, leave this running at all times
@@ -48,9 +50,11 @@ Build ind_nav demo without random_april_tag_turns_node:
 Run test module (subset of goto-1 solution) in another terminal window:
     $ dts devel watchtower stop -H maserati4pgts.local
     $ chmod +x ./packages/my_package/src/localization_node_test.py
+    $ chmod +x ./packages/my_package/src/state_estimation_node.py
     $ dts devel build -f --arch arm32v7 -H maserati4pgts.local
+
     # Delete ROBOT_IP and PC_IP, replace IMAGE_NAME:IMAGE_TAG with retrieved image name
-    $ docker -H maserati4pgts.local run -it --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP=192.168.1.116:11311/ -e ROS_IP=PC_IP=192.168.1.95 --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
+    $ docker -H maserati4pgts.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP=192.168.1.116:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 
     Within /bin/bash run the following (if not, default value will be used as defined in localization_node_test.launch):
     $ roslaunch my_package localization_node_test.launch goal_input:="63" goal_distance:="40" robot_name:="maserati4pgts"
@@ -66,4 +70,3 @@ Start indefinite_navigation via joystick keyboard_control
     $ dts duckiebot keyboard_control maserati4pgts
     # or
     $ dts duckiebot keyboard_control maserati4pgts --base_image duckietown/dt-core:daffy-amd64
-
