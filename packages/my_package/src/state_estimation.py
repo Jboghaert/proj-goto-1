@@ -38,11 +38,6 @@ class StateEstimator(DTROS):
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
-        # Ensure optimal computation, rescale image
-        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
-        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
-
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
         self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
@@ -63,6 +58,15 @@ class StateEstimator(DTROS):
     def cbLocalization(self, msg):
         # Keep this true, independent from new message
         self.estimator = True
+
+        # WARNING: only update image here (else all camera feed for all nodes is of low quality)
+        # Ensure optimal computation, rescale image
+        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
+        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+
+        # Create timer to update params of camera_node
+        #rospy.Timer(rospy.Duration.from_sec(2.0), self.updateParams)
 
 
     def cbCamera(self, img):

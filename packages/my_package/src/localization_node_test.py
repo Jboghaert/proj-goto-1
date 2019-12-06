@@ -79,7 +79,7 @@ class LocalizationNode(DTROS):
         self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
         self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
         self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
-        self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
+        #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
         self.pub_state_estimator = rospy.Publisher('/%s/localization_node_test/estimator_trigger' %self.veh_name, BoolStamped, queue_size = 1)
 
         # Conclude
@@ -113,7 +113,7 @@ class LocalizationNode(DTROS):
         # Filter out INTERSECTION_CONTROL modes
         if(self.fsm_mode != mode_msg.INTERSECTION_CONTROL):
             self.turn_type = -1
-            self.pub_turn_type.publish(self.turn_type)
+            #self.pub_turn_type.publish(self.turn_type)
 
 
     def callback(self, msg):
@@ -292,7 +292,7 @@ class LocalizationNode(DTROS):
 
     def publishCmd(self, new_cmd):
         self.pub_direction_cmd.publish(new_cmd)
-        self.pub_turn_type.publish(new_cmd.turn_type)
+        #self.pub_turn_type.publish(new_cmd.turn_type)
         rospy.loginfo("Published turn_cmd and turn_type")
         # Once published, keep self.plan == False
         self.plan = False
