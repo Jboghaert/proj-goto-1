@@ -1,19 +1,22 @@
 # Guideline for testmodule 1.0 of project Goto-1 (AMOD 2019)
 Author: J. Boghaert
+
 Tutor: M. Hosner, G. Zardini
+
 Group: Global Localization (GOTO-1)
+
 Class: Autonomous Mobility on Demand (Duckietown) 2019
 
 ## Implementation
-The scripts within proj-goto-1 are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**. For the requirements, see section 'Important'.
+The scripts within proj-goto-1 are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**. For the requirements, see section 'Important'. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
 
 ## Guideline
 Carefully follow the steps below to implement the proj-goto-1 solution onto your duckiebot.
-- [] Read the README.md file
-- [] Scan through the scripts and change the name of the DB if necessary
-- [] Read the cmd.txt file
-- [] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
-- [] Execute the cmd.txt file
+- [ ] Read the README.md file
+- [ ] Scan through the scripts and change the name of the DB if necessary
+- [ ] Read the cmd.txt file
+- [ ] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
+- [ ] Execute the cmd.txt file
 
 ## Important
 This code assumes the following:
