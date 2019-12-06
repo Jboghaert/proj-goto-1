@@ -52,8 +52,8 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
-        self.pub_mask_compressed = rospy.Publisher('~/%s/state_estimation/mask_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-        self.pub_crop_compressed = rospy.Publisher('~/%s/state_estimation/crop_compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_mask_compressed = rospy.Publisher('~/%s/state_estimation/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_crop_compressed = rospy.Publisher('~/%s/state_estimation/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
