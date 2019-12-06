@@ -38,8 +38,10 @@ class StateEstimator(DTROS):
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
+        # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 10.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
