@@ -52,8 +52,8 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
-        self.pub_mask_compressed = rospy.Publisher('~/%s/state_estimation/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-        self.pub_crop_compressed = rospy.Publisher('~/%s/state_estimation/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_mask_compressed = rospy.Publisher('~/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_crop_compressed = rospy.Publisher('~/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -84,11 +84,11 @@ class StateEstimator(DTROS):
             # Convert to OpenCV image in HSV
             img = self.colourConverter(self.imageConverter(img))
             rospy.loginfo('Done #1')
-            # Extract necessary image part
-            img = self.imageSplitter(img)
+            # Extract necessary image part, sum HSV values
+            sum = self.imageSplitter(img)
             rospy.loginfo('Done #2')
             # Count number of blobs (= midline stripes)
-            self.blobCounter(img)
+            self.blobCounter(sum)
             rospy.loginfo('Done #3')
             # Stop when threshold is reached
             #return self.number
@@ -111,9 +111,10 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([20, 50, 180], np.uint8)
-        upper_yellow = np.array([35, 255, 255], np.uint8)
+        lower_yellow = np.array([20, 50, 180]) #np.uint8
+        upper_yellow = np.array([35, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
+
         # Output yellow/black image only
         result = cv2.bitwise_and(imgHSV, imgHSV, mask = mask_yellow)
         self.publishMask(result)
@@ -121,12 +122,12 @@ class StateEstimator(DTROS):
 
 
     def imageSplitter(self, img):
-        # Split image
-        img_to_pub = img[30:40,:]
         # Publish cropped mask for inspection and tuning of the above interval and framerate
+        img_to_pub = img[30:40,:]
         self.publishCrop(img_to_pub)
 
-        img_crop = np.sum(img[30:40,:]==255) #255?
+        # Sum hsv values over a 2px high image
+        img_crop = np.sum(img[38:40,:]==255) #255?
         return img_crop
 
 
@@ -159,19 +160,21 @@ class StateEstimator(DTROS):
 
     def publishMask(self, mask):
         # bring back to BGR
-        mask = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
+        #mask = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
         # set up message type
         maskmsg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
         maskmsg.data = self.bridge.cv2_to_compressed_imgmsg(mask)
+        # publish
         self.pub_mask_compressed.publish(maskmsg)
 
 
     def publishCrop(self, crop):
         # bring back to BGR
-        crop = cv2.cvtColor(crop, cv2.COLOR_HSV2BGR)
+        #crop = cv2.cvtColor(crop, cv2.COLOR_HSV2BGR)
         # set up message type
         cropmsg = CompressedImage()
         cropmsg.data = self.bridge.cv2_to_compressed_imgmsg(crop)
+        # publish
         self.pub_crop_compressed.publish(cropmsg)
 
 
