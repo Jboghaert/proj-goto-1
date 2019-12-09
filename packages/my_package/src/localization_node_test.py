@@ -11,7 +11,13 @@
 # If the final AT is reached, a state estimation function (listening to the camera_node topic) is started (issue: actions wrt. both subscribers are coupled)
 
 # TODO:
-# Include os.environ to automatically update DB name
+# Include os.environ to automatically update DB name - make all parameters dynamic
+# Fix state state_estimation
+# Include analysis of AmOD
+# Include dynamic trim/gain tuner - include tune_file.txt
+# Include that when pressing S in joystick, the SE stops as well (as does the AT input)
+# Check for lag between camera and actual
+# Only do SE when not in self.state = intersection something
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 

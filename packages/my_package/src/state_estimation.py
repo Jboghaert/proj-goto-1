@@ -90,6 +90,8 @@ class StateEstimator(DTROS):
     def cbCamera(self, img):
         if self.estimator == True:
 
+            # ADD: only do the following if self.state != intersection something
+
             rospy.loginfo('Preparing image')
             # Convert to OpenCV image in HSV
             img = self.colourConverter(self.imageConverter(img))
@@ -120,8 +122,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([32, 100, 180]) #np.uint8
-        upper_yellow = np.array([38, 255, 255]) #np.uint8
+        lower_yellow = np.array([29, 80, 180]) #np.uint8
+        upper_yellow = np.array([32, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only
@@ -179,8 +181,6 @@ if __name__ == "__main__":
     node = StateEstimator(node_name="node_name")
     # Keep it spinning to keep the node alive
     rospy.spin()
-
-
 
 
 """
