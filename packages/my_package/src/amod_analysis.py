@@ -50,11 +50,6 @@ class StateEstimator(DTROS):
 
         #Anti-instagram node sub (corrected, ...)
 
-        # List publishers
-        self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
-        self.pub_mask_compressed = rospy.Publisher('~/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-        self.pub_crop_compressed = rospy.Publisher('~/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
         self.rate = rospy.Rate(20)
@@ -92,90 +87,10 @@ class StateEstimator(DTROS):
             rospy.loginfo('Done #3')
             # Stop when threshold is reached
             #return self.number
+
         else:
             pass
 
-
-    def imageConverter(self, img):
-        # Convert image to cv2
-        try:
-            cv2_img = self.bridge.compressed_imgmsg_to_cv2(img)
-            return cv2_img
-        except CvBridgeError as e:
-            rospy.loginfo('Error encountered while converting image')
-            return [] #pass
-
-
-    def colourConverter(self, img):
-        # Convert BGR color of image to HSV
-        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        # Set boundaries
-        lower_yellow = np.array([20, 50, 180]) #np.uint8
-        upper_yellow = np.array([35, 255, 255]) #np.uint8
-        mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
-
-        # Output yellow/black image only
-        result = cv2.bitwise_and(imgHSV, imgHSV, mask = mask_yellow)
-        self.pub_mask_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(result))
-        return result
-
-
-    def imageSplitter(self, img):
-        # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[30:40,:]
-        self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
-
-        # Sum hsv values over a 2px high image
-        img_crop = np.sum(img[38:40,:]==255) #255?
-        return img_crop
-
-
-    def blobCounter(self, img):
-        # WARNING: not robust against noise from other yellow marks (s.a. duckies)
-        # Currrently incoming TOPimage
-        self.current = np.sum(img)
-        rospy.loginfo('Done #3.1')
-        # If not black (= yellow)
-        if self.current != 0: # For robustness, increase threshold if self.current > some_value:
-            # Only count when discontinuity was encountered, and yellow is again True
-            rospy.loginfo('Encountered fully black image from mask')
-            if self.go == True:
-                self.number = self.number + 1
-                # Do not come back, unless fully black image (=line discontinuity) is encountered
-                self.go = False
-                rospy.loginfo('Reached [-- %s --] stripes, encounting ...' % str(self.number))
-                self.pub_localization.publish(self.number)
-
-            else:
-                #self.go = False
-                rospy.loginfo('Huh #1')
-                pass
-        # If black, reset trigger
-        else:
-            # As soon as image is not fully black anymore, start counting
-            rospy.loginfo('Done #3.2')
-            self.go = True
-
-"""
-    def publishMask(self, mask):
-        # bring back to BGR
-        #mask = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
-        # set up message type
-        maskmsg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
-        maskmsg.data = self.bridge.cv2_to_compressed_imgmsg(mask)
-        # publish
-        self.pub_mask_compressed.publish(maskmsg)
-
-
-    def publishCrop(self, crop):
-        # bring back to BGR
-        #crop = cv2.cvtColor(crop, cv2.COLOR_HSV2BGR)
-        # set up message type
-        cropmsg = CompressedImage()
-        cropmsg.data = self.bridge.cv2_to_compressed_imgmsg(crop)
-        # publish
-        self.pub_crop_compressed.publish(cropmsg)
-"""
 
 # SAFETY & EMERGENCY
     def on_shutdown(self):
