@@ -23,18 +23,15 @@ from cv_bridge import CvBridge
 
 
 # INITIATE DTROS CLASS (incl sub/pub)
-class StateEstimator(DTROS):
+class AmodAnalyzer(DTROS):
 
     def __init__(self, node_name):
         # Initialize, specify 'node_name' further in 'if __name__ ...'
-        super(StateEstimator, self).__init__(node_name=node_name)
+        super(AmodAnalyzer, self).__init__(node_name=node_name)
 
         # Initialize variables (once)
         self.node_name = "state_estimation"
         self.veh_name = "maserati4pgts"
-        self.number = 0
-        self.estimator = False # don't start this node unless 'True' from localization_node
-        self.go = False
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -47,8 +44,6 @@ class StateEstimator(DTROS):
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
         self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
-
-        #Anti-instagram node sub (corrected, ...)
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -101,6 +96,6 @@ class StateEstimator(DTROS):
 # KEEP NODE ALIVE
 if __name__ == "__main__":
     # Initialize the node with rospy
-    node = StateEstimator(node_name="node_name")
+    node = AmodAnalyzer(node_name="node_name")
     # Keep it spinning to keep the node alive
     rospy.spin()

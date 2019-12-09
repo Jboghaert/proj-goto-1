@@ -31,7 +31,7 @@ class StateEstimator(DTROS):
 
         # Initialize variables (once)
         self.node_name = "state_estimation"
-        self.veh_name = "maserati4pgts"
+        self.veh_name = os.environ['VEHICLE_NAME']
         self.number = 0
         self.estimator = False # don't start this node unless 'True' from localization_node
         self.go = False
@@ -43,6 +43,16 @@ class StateEstimator(DTROS):
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+
+        # Correct trim values from terminal for state_estimation (only lane keeping)
+        #self.se_gain = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
+        #self.se_trim = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
+        #self.se_other = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
+
+        #rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #trim value to desired velocity
+        #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #trim value to desired velocity
+        #rospy.set_param('/%s/kinematics_node/other' % self.veh_name, self.se_other) #trim value to desired velocity
+
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
@@ -110,7 +120,7 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([20, 50, 180]) #np.uint8
+        lower_yellow = np.array([28, 50, 180]) #np.uint8
         upper_yellow = np.array([35, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 

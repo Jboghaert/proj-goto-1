@@ -10,6 +10,9 @@
 # The path_planning module returns the shortest path and executable wheel commands that are then published to unicorn_intersection_node
 # If the final AT is reached, a state estimation function (listening to the camera_node topic) is started (issue: actions wrt. both subscribers are coupled)
 
+# TODO:
+# Include os.environ to automatically update DB name
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
 
@@ -40,7 +43,7 @@ class LocalizationNode(DTROS):
 
         # Initialize variables
         self.node_name = "localization_node_test"
-        self.veh_name = "maserati4pgts"
+        self.veh_name = os.environ['VEHICLE_NAME']
         # Related to path planning
         self.AT = False #start localization or not
         self.new_AT = True #start execution or not
