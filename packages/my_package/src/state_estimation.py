@@ -156,6 +156,23 @@ class StateEstimator(DTROS):
             rospy.loginfo('Done #3.2')
             self.go = True
 
+
+# SAFETY & EMERGENCY
+    def on_shutdown(self):
+        #self.number = 0
+        rospy.loginfo("[%s] Shutting down." % (self.node_name))
+
+
+# KEEP NODE ALIVE
+if __name__ == "__main__":
+    # Initialize the node with rospy
+    node = StateEstimator(node_name="node_name")
+    # Keep it spinning to keep the node alive
+    rospy.spin()
+
+
+
+
 """
     def publishMask(self, mask):
         # bring back to BGR
@@ -176,16 +193,3 @@ class StateEstimator(DTROS):
         # publish
         self.pub_crop_compressed.publish(cropmsg)
 """
-
-# SAFETY & EMERGENCY
-    def on_shutdown(self):
-        #self.number = 0
-        rospy.loginfo("[%s] Shutting down." % (self.node_name))
-
-
-# KEEP NODE ALIVE
-if __name__ == "__main__":
-    # Initialize the node with rospy
-    node = StateEstimator(node_name="node_name")
-    # Keep it spinning to keep the node alive
-    rospy.spin()
