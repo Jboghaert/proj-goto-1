@@ -42,7 +42,7 @@ class StateEstimator(DTROS):
         # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # Correct trim values from terminal for state_estimation (only lane keeping)
         #self.se_gain = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
@@ -67,7 +67,7 @@ class StateEstimator(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        self.rate = rospy.Rate(20)
+        self.rate = rospy.Rate(25)
         self.bridge = CvBridge()
 
 
@@ -120,8 +120,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([28, 50, 180]) #np.uint8
-        upper_yellow = np.array([35, 255, 255]) #np.uint8
+        lower_yellow = np.array([32, 100, 180]) #np.uint8
+        upper_yellow = np.array([38, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only

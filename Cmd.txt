@@ -57,7 +57,7 @@ Run test module (subset of goto-1 solution) in another terminal window:
     $ docker -H maserati4pgts.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP=192.168.1.116:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 
     Within /bin/bash run the following (if not, default value will be used as defined in localization_node_test.launch):
-    $ roslaunch my_package localization_node_test.launch goal_input:="199" goal_distance:="40"
+    $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
     #Ignore: robot_name:="maserati4pgts"
 
 
