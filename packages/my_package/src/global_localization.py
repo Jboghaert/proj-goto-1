@@ -69,15 +69,25 @@ class LocalizationNode(DTROS):
         # Get arrival point (from roslaunch/docker cmd setting the parameter 'goal_input' in terminal)
         self.goal = rospy.get_param('/%s/goal_input' % self.node_name) # of type final AT id [int32]
         self.goal_distance = rospy.get_param('/%s/goal_distance' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
-        self.goal_discrete = int(self.goal_distance / self.stripe_length) + 3 # discretize length in cm to number of stripes, compensate view with 3 additional stripes for actual position
+        self.goal_discrete = int(self.goal_distance / self.stripe_length) + 3 # discretize length in cm to number of stripes, compensate view/delays with 3 additional stripes for actual position
 
         # Import from external class PathPlanner as pp
         self.pp = PathPlanner()
         self.tags = self.pp.tags
         self.graph = self.pp.graph
 
-        # Adjustment for indefinite navigation
-        rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.5) #trim value to desired velocity
+
+        # Adjustment for intersection navigation (passed from terminal) - could also be done by remapping in launch file !!
+        self.ff_left = rospy.get_param('/%s/inter_nav_ff_left' % self.node_name) #default = 0.4
+        self.ff_right = rospy.get_param('/%s/inter_nav_ff_right' % self.node_name) #default = -0.6
+        self.time_l_turn = rospy.get_param('/%s/inter_nav_time_left_turn' % self.node_name) #default = 3.2
+        self.time_r_turn = rospy.get_param('/%s/inter_nav_time_right_turn' % self.node_name) #default = 1.5
+
+        rospy.set_param('/%s/unicorn_intersection_node/ff_left' % self.veh_name, self.ff_left) #desired values during intersection navigation
+        rospy.set_param('/%s/unicorn_intersection_node/ff_right' % self.veh_name, self.ff_right)
+        rospy.set_param('/%s/unicorn_intersection_node/time_left_turn' % self.veh_name, self.time_l_turn)
+        rospy.set_param('/%s/unicorn_intersection_node/time_right_turn' % self.veh_name, self.time_r_turn)
+
 
         # List subscribers
         self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback) #from apriltags_postprocessing_node

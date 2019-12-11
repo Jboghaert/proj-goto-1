@@ -2,13 +2,31 @@
 
   <arg name="goal_input" default="231"/>
   <arg name="goal_distance" default="40"/>
+  <arg name="new_gain" default="0.5"/>
+
+  <arg name="inter_nav_ff_left" default="0.4"/>
+  <arg name="inter_nav_ff_right" default="-0.6"/>
+  <arg name="inter_nav_time_left_turn" default="3.2"/>
+  <arg name="inter_nav_time_right_turn" default="1.5"/>
+
 
   <group>
-    <node pkg="my_package" type="global_localization.py" name="global_localization" output="screen" args="$(arg goal_input) $(arg goal_distance)">
+    <node pkg="my_package" type="global_localization.py" name="global_localization" output="screen" args="$(arg goal_input) $(arg goal_distance) $(arg inter_nav_ff_left) $(arg inter_nav_ff_right) $(arg inter_nav_time_left_turn) $(arg inter_nav_time_right_turn)">
+
       <param name="goal_input" type="int" value="$(arg goal_input)" />
       <param name="goal_distance" type="int" value="$(arg goal_distance)" />
+
+      <param name="inter_nav_ff_left" type="float" value="$(arg inter_nav_ff_left)" />
+      <param name="inter_nav_ff_right" type="float" value="$(arg inter_nav_ff_right)" />
+      <param name="inter_nav_time_left_turn" type="float" value="$(arg inter_nav_time_left_turn)" />
+      <param name="inter_nav_time_right_turn" type="float" value="$(arg inter_nav_time_right_turn)" />
+
     </node>
-    <node pkg="my_package" type="state_estimation.py" name="state_estimation" output="screen"/>
+    <node pkg="my_package" type="state_estimation.py" name="state_estimation" output="screen" args="$(arg new_gain)">
+
+      <param name="new_gain" type="float" value="$(arg new_gain)" />
+
+    </node>
   </group>
 
 </launch>
