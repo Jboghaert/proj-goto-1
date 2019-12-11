@@ -88,8 +88,8 @@ class StateEstimator(DTROS):
 
 
     def cbCamera(self, img):
-        rospy.loginfo('Waiting for intersection navigation to finish')
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
+        rospy.loginfo('Intersection navigation finished, going to state estimation')
         #only do the following if self.state != intersection something
 
             if self.estimator == True:
