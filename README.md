@@ -2,15 +2,32 @@
      <img src="media/header.png" style='width: 20em'/>
 </div>
 
-# Global Localization GOTO-1 (AMOD 2019 - ETH Zürich)
+
+# Global Localization GOTO-1
 Author: J. Boghaert
 
 Tutors: M. Hosner, G. Zardini
 
-Add Description
+Add Description & objective
+
+<div figure-id="fig:pipeline_vis">
+     <img src="media/pipeline_vis.png" style='width: 20em'/>
+</div>
+
+
 
 ## Implementation prerequisites
-The scripts within the GOTO-1 project are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). For the requirements, see section 'Important'. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
+The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
+
+Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections. For the requirements, see section 'Important'. The entire project is based on a ROS-template.
+
+### Setting up the framework
+Include ros graph default
+
+### Implementing GOTO-1
+Include ros graph with altered structure
+
+
 
 ## Guideline
 Carefully follow the steps below to implement the proj-goto-1 solution onto your duckiebot.
@@ -42,3 +59,4 @@ The code itself explains in- and output arguments, as well as additional informa
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes.
 
 ## Troubleshooting
+As the existing framework of `indefinite_navigation` is not stable, the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal.
