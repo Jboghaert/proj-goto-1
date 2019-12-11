@@ -13,15 +13,15 @@ The goal of this project is to navigate a single Duckiebot within a predefined D
 
 
 ## Content & pipeline structure
-Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. 
+Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
 
 <div figure-id="fig:pipeline_vis">
      <img src="media/pipeline_vis.png" style='width: 20em'/>
 </div>
 
-**Legenda:** Unmarked inputs are given or self-determined, grey-marked blocks are running in the existing framework of `indefinite_navigation`, and grey-marked items within a blue box represent the custom blocks developed for GOTO-1.
+**Legenda:** Unmarked inputs are given or self-determined, yellow blocks are running in the existing framework of `indefinite_navigation`, and orange/grey-marked items represent the custom blocks developed for GOTO-1.
 
-#### 1. localization_node
+#### 1. global_localization_node
 This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of GOTO-1 and generates the desired turn commands at each intersection, as well as the stop command upon arrival. The driving input of this code are the intersection AT's, serving as nodes for the `path_planning_class` outlined next.
 
 **Note:**
@@ -55,7 +55,6 @@ Include ros graph default
 
 
 ### Implementing GOTO-1
-Include ros graph with altered structure
 
 Now build the image:
 ```
@@ -69,6 +68,14 @@ Then run the GOTO-1 module, and access its root to pass the desired input comman
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 ```
+
+<div figure-id="fig:global_localization">
+     <img src="media/global_localization.png" style='width: 9em'/>
+</div>
+<div figure-id="fig:state_estimation">
+     <img src="media/state_estimation.png" style='width: 9em'/>
+</div>
+
 
 ### Stopping procedure:
 When stopping the GOTO-1 module, do the following:
