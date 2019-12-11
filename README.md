@@ -85,13 +85,6 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
   </div>
 </div>
 
-<div figure-id="fig:global_localization">
-     <img src="media/global_localization.png" style='width: 9em'/>
-</div>
-<div figure-id="fig:state_estimation">
-     <img src="" style='width: 9em'/>
-</div>
-
 
 ### Stopping procedure:
 When stopping the GOTO-1 module, do the following:
