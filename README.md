@@ -74,7 +74,7 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 When stopping the GOTO-1 module, do the following:
 - stop all activated and created containers in portainer, wait for the processes to finish cleanly,
 - ssh into your Duckiebot using the following command. Wait for 30 seconds before plugging out the battery.
-    `$ ssh DUCKIEBOT_NAME sudo poweroff`
+`$ ssh DUCKIEBOT_NAME sudo poweroff`
 
 
 ### Important assumptions

@@ -52,14 +52,14 @@ class StateEstimator(DTROS):
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
         self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
-        self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
+        #self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
 
         #Anti-instagram node sub (corrected, ...)
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if necessary, don't publish continuously (requires import of goal_discrete param)
-        self.pub_mask_compressed = rospy.Publisher('~/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-        self.pub_crop_compressed = rospy.Publisher('~/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_mask_compressed = rospy.Publisher('/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        self.pub_crop_compressed = rospy.Publisher('/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -69,9 +69,9 @@ class StateEstimator(DTROS):
 
 # CODE GOES HERE
 
-    def cbMode(self, mode_msg):
+    #def cbMode(self, mode_msg):
         # Get FSM mode
-        self.fsm_mode = mode_msg.state
+        #self.fsm_mode = mode_msg.state
 
 
     def cbLocalization(self, msg):
@@ -89,30 +89,30 @@ class StateEstimator(DTROS):
 
 
     def cbCamera(self, img):
-        if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-            #only do the following if self.state != intersection something
+        #if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
+        #    #only do the following if self.state != intersection something
 
-            if self.estimator == True:
-                rospy.loginfo('Intersection navigation finished, going to state estimation')
+        if self.estimator == True:
+            rospy.loginfo('Intersection navigation finished, going to state estimation')
 
-                # Only once in SE, change kinematic params
-                rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
-                #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
+            # Only once in SE, change kinematic params
+            rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
+            #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
 
-                rospy.loginfo('Preparing image')
-                # Convert to OpenCV image in HSV
-                img = self.colourConverter(self.imageConverter(img))
-                rospy.loginfo('Done #1')
-                # Extract necessary image part, sum HSV values
-                sum = self.imageSplitter(img)
-                rospy.loginfo('Done #2')
-                # Count number of blobs (= midline stripes)
-                self.blobCounter(sum)
-                rospy.loginfo('Done #3')
-            else:
-                pass
+            rospy.loginfo('Preparing image')
+            # Convert to OpenCV image in HSV
+            img = self.colourConverter(self.imageConverter(img))
+            rospy.loginfo('Done #1')
+            # Extract necessary image part, sum HSV values
+            sum = self.imageSplitter(img)
+            rospy.loginfo('Done #2')
+            # Count number of blobs (= midline stripes)
+            self.blobCounter(sum)
+            rospy.loginfo('Done #3')
         else:
             pass
+        #else:
+        #    pass
 
 
     def imageConverter(self, img):
