@@ -1,43 +1,44 @@
-# Template: template-ros
+<div figure-id="fig:header">
+     <img src="media/header.png" style='width: 20em'/>
+</div>
 
-This template provides a boilerplate repository
-for developing ROS-based software in Duckietown.
+# Global Localization GOTO-1 (AMOD 2019 - ETH Zürich)
+Author: J. Boghaert
 
-**NOTE:** If you want to develop software that does not use
-ROS, check out [this template](https://github.com/duckietown/template-basic).
+Tutors: M. Hosner, G. Zardini
 
+Add Description
 
-## How to use it
+## Implementation prerequisites
+The scripts within the GOTO-1 project are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**, more info to be found [here] (https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). For the requirements, see section 'Important'. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
 
-### 1. Fork this repository
+## Guideline
+Carefully follow the steps below to implement the proj-goto-1 solution onto your duckiebot.
+- [ ] Read the README.md file
+- [ ] Scan through the scripts and change the name of the DB if necessary
+- [ ] Read the cmd.txt file
+- [ ] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
+- [ ] Execute the cmd.txt file and change all DB dependent parameters if necessary (s.a. IP address and name)
 
-Use the fork button in the top-right corner of the github page to fork this template repository.
+## Important
+This code assumes the following:
+- DT map as hardcoded in path_planning_class
+- no other AT's present as the ones hardcoded in path_planning_class
+- no varying lighting conditions
+- no external factors (s.a. obstacles)
+- a well functioning indefinite_navigation demo version with ROS graph as attached
 
+## Content
+### 1. my_package
+This package contains 2 nodes and an external class for path planning using a predefined map of DT.
 
-### 2. Create a new repository
+#### a. localization_node
+This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of proj-goto-1 and generates the desired turn commands at each intersection. The driving input of this code are the intersection AT's.
 
-Create a new repository on github.com while
-specifying the newly forked template repository as
-a template for your new repository.
+**Note:**
+The code itself explains in- and output arguments, as well as additional information on the exact approach and reasoning behind it.
 
+#### b. state_estimation_node
+This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes.
 
-### 3. Define dependencies
-
-List the dependencies in the files `dependencies-apt.txt` and
-`dependencies-py.txt` (apt packages and pip packages respectively).
-
-
-### 4. Place your code
-
-Place your ROS packages in the directory `/packages` of
-your new repository.
-
-**NOTE:** Do not use absolute paths in your code,
-the code you place under `/packages` will be copied to
-a different location later.
-
-
-### 5. Setup the launchfile
-
-Change the file `launch.sh` in your repository to
-launch your code.
+## Troubleshooting

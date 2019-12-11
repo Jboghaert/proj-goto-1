@@ -122,8 +122,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([29, 80, 180]) #np.uint8
-        upper_yellow = np.array([32, 255, 255]) #np.uint8
+        lower_yellow = np.array([25, 80, 180]) #np.uint8
+        upper_yellow = np.array([30, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only
@@ -134,7 +134,7 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[30:40,:]
+        img_crop_pub = img[390:400,:] #ipv 38:40
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a 2px high image

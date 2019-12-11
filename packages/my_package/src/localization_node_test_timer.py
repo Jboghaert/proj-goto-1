@@ -62,8 +62,15 @@ class LocalizationNode(DTROS):
         self.goal_distance = rospy.get_param('/%s/goal_distance' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
 
         # Get parameters
-        self.gain = rospy.get_param('/%s/kinematics_node/gain' % self.veh_name)
-        self.trim = rospy.get_param('/%s/kinematics_node/trim' % self.veh_name)
+        self.new_gain = rospy.get_param('/%s/new_gain' % self.node_name)
+        self.new_trim = rospy.get_param('/%s/new_trim' % self.node_name)
+
+        self.gain = rospy.get_param('/%s/kinematics_node/gain' % self.veh_name) #for info
+        self.trim = rospy.get_param('/%s/kinematics_node/trim' % self.veh_name) #for info
+
+        # Set parameters
+        rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.new_gain)
+        rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.new_trim)
 
         # Import from external class PathPlanner as pp
         self.pp = PathPlanner()

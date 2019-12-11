@@ -8,9 +8,9 @@
 import numpy as np
 import os
 import rospy
-import yaml
 import time
-import cv2
+
+import matplotlib as plt
 
 from duckietown import DTROS
 from duckietown_msgs.msg import AprilTagsWithInfos, TagInfo, AprilTagDetection, TurnIDandType
@@ -18,8 +18,6 @@ from duckietown_msgs.msg import BoolStamped, FSMState
 from std_msgs.msg import Int16
 from sensor_msgs.msg import CompressedImage, Image
 from duckietown_msgs.msg import WheelsCmdStamped
-
-from cv_bridge import CvBridge
 
 
 # INITIATE DTROS CLASS (incl sub/pub)
@@ -31,7 +29,11 @@ class AmodAnalyzer(DTROS):
 
         # Initialize variables (once)
         self.node_name = "state_estimation"
-        self.veh_name = "maserati4pgts"
+        self.veh_name = os.environ['VEHICLE_NAME']
+
+        self.FSM_elapsed = 0
+        self.Loc_elapsed = 0
+        self.Vel_elapsed = 0
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -42,8 +44,9 @@ class AmodAnalyzer(DTROS):
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # List subscribers
-        self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
-        self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
+        self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLoc)
+        self.sub_state_estimator = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbSE)
+        self.sub_wheel_actuation = rospy.Subscriber('something' % self.veh_name, BoolStamped, self.cbVel)
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -53,43 +56,70 @@ class AmodAnalyzer(DTROS):
 
 # CODE GOES HERE
 
-    def cbLocalization(self, msg):
-        # Keep this true, independent from new message
-        self.estimator = True
+    def cbFSM(self, FSMmsg):
+        while FSMmsg == active:
+            while FSMmsg.something == something:
+                    # Define locally
+                    FSM_start = time.time #in seconds
+                    FSM_elapsed = time.time - start
+                    # Define globally - continuously update
+                    self.FSM1_elapsed = self.FSM1_elapsed + FSM_elapsed
 
-        # WARNING: only update image here (else all camera feed for all nodes is of low quality)
-        # Ensure optimal computation, rescale image
-        #rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
-        #rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
-        #rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+            while FSMmsg.something == something_else:
+                    # Define locally
+                    FSM_start = time.time
+                    FSM_elapsed = time.time - start
+                    # Define globally - continuously update
+                    self.FSM2_elapsed = self.FSM1_elapsed + FSM_elapsed
 
-        # Create timer to update params of camera_node
-        #rospy.Timer(rospy.Duration.from_sec(2.0), self.updateParams)
-
-
-    def cbCamera(self, img):
-        if self.estimator == True:
-
-            rospy.loginfo('Preparing image')
-            # Convert to OpenCV image in HSV
-            img = self.colourConverter(self.imageConverter(img))
-            rospy.loginfo('Done #1')
-            # Extract necessary image part, sum HSV values
-            sum = self.imageSplitter(img)
-            rospy.loginfo('Done #2')
-            # Count number of blobs (= midline stripes)
-            self.blobCounter(sum)
-            rospy.loginfo('Done #3')
-            # Stop when threshold is reached
-            #return self.number
-
+            while FSMmsg.something == something_else:
+                    # Define locally
+                    FSM_start = time.time
+                    FSM_elapsed = time.time - start
+                    # Define globally - continuously update
+                    self.FSM3_elapsed = self.FSM1_elapsed + FSM_elapsed
         else:
             pass
 
 
+    def cbLoc(self, Locmsg):
+        while Locmsg == active:
+            # Define locally
+            FSM_start = time.time
+            FSM_elapsed = time.time - start
+            # Define globally - continuously update
+            self.Loc_elapsed = self.Loc_elapsed + FSM_elapsed
+        else:
+            pass
+
+
+    def cbVel(self, Velmsg):
+        while Velmsg == active:
+            # Define locally
+            Vel_start = time.time
+            Vel_elapsed = time.time - start
+            # Define globally - continuously update
+            self.Vel_elapsed = self.Vel_elapsed + FSM_elapsed
+        else:
+            pass
+
+
+    def plotAmod(self):
+        # Set up state space (FSM1,2,3, Loc and Vel)
+        x_val = [1, 2, 3, 4, 5]
+        y_val = [self.FSM1_elapsed, self.FSM2_elapsed, self.FSM3_elapsed, self.Loc_elapsed, self.Vel_elapsed]
+        # Compare separate states (MECE) and wheels active/non-active
+        y_label = ['Intersection Active', 'State Estimator Active', 'Indefinite Navigation Active', 'Localization Active', 'Wheels Active']
+
+        # Plot values upon shutdown
+        plt.bar(x_val, y_val, tick_label = y_label, width = 0.5, color = ['blue', 'green'])
+        plt.xlabel('Duckiebot states')
+        plt.ylabel('Duration (s)')
+        plt.title('Time spent by %s per state' %self.veh_name)
+
+
 # SAFETY & EMERGENCY
     def on_shutdown(self):
-        #self.number = 0
         rospy.loginfo("[%s] Shutting down." % (self.node_name))
 
 
