@@ -10,7 +10,7 @@ Tutors: M. Hosner, G. Zardini
 Add Description
 
 ## Implementation prerequisites
-The scripts within the GOTO-1 project are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**, more info to be found [here] (https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). For the requirements, see section 'Important'. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
+The scripts within the GOTO-1 project are written for the 2019 Duckietown class at ETH Zürich. It should be implemented in the existing framework of **indefinite navigation**, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). For the requirements, see section 'Important'. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown.
 
 ## Guideline
 Carefully follow the steps below to implement the proj-goto-1 solution onto your duckiebot.
