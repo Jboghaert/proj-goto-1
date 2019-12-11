@@ -128,8 +128,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([27, 80, 180]) #np.uint8
-        upper_yellow = np.array([29, 255, 255]) #np.uint8
+        lower_yellow = np.array([28, 80, 180]) #np.uint8
+        upper_yellow = np.array([31, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only
@@ -143,8 +143,8 @@ class StateEstimator(DTROS):
         img_crop_pub = img[390:400,0:320] #ipv 38:40
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
-        # Sum hsv values over a 2px high image
-        img_crop = np.sum(img[398:400,:]==255) #255?
+        # Sum hsv values over a 2px high image, take out noise from right side (duckies)
+        img_crop = np.sum(img[398:400,0:400]==255) #255?
         return img_crop
 
 
@@ -187,25 +187,3 @@ if __name__ == "__main__":
     node = StateEstimator(node_name="node_name")
     # Keep it spinning to keep the node alive
     rospy.spin()
-
-
-"""
-    def publishMask(self, mask):
-        # bring back to BGR
-        #mask = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
-        # set up message type
-        maskmsg = CompressedImage() #http://docs.ros.org/melodic/api/sensor_msgs/html/index-msg.html
-        maskmsg.data = self.bridge.cv2_to_compressed_imgmsg(mask)
-        # publish
-        self.pub_mask_compressed.publish(maskmsg)
-
-
-    def publishCrop(self, crop):
-        # bring back to BGR
-        #crop = cv2.cvtColor(crop, cv2.COLOR_HSV2BGR)
-        # set up message type
-        cropmsg = CompressedImage()
-        cropmsg.data = self.bridge.cv2_to_compressed_imgmsg(crop)
-        # publish
-        self.pub_crop_compressed.publish(cropmsg)
-"""
