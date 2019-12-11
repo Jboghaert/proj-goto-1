@@ -69,12 +69,17 @@ $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /dat
 $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 ```
 
-#https://www.w3schools.com/howto/howto_css_images_side_by_side.asp
+<html>
+<head>
+<style>
+* {box-sizing: border-box;}
 
-#.column {
-#float: left;
-#width: 33.33%;
-#padding: 5px;
+.column {float: left; width: 33.33%; padding: 5px;}
+
+.row::after {content: ""; clear: both; display: table;}
+</style>
+</head>
+<body>
 
 <div class="row">
   <div class="column">
@@ -84,6 +89,10 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
     <img src="media/state_estimation.png" alt="ROS2" style="width:50%">
   </div>
 </div>
+
+</body>
+</html>
+
 
 
 ### Stopping procedure:
