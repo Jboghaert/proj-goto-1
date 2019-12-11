@@ -88,14 +88,14 @@ class StateEstimator(DTROS):
 
 
     def cbCamera(self, img):
-        if self.estimator == True:
-            # Only once in SE, change kinematic params
-            rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
-            #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
-            rospy.loginfo('Waiting for intersection navigation to finish')
+        rospy.loginfo('Waiting for intersection navigation to finish')
+        if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
+        #only do the following if self.state != intersection something
 
-            if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-            #only do the following if self.state != intersection something
+            if self.estimator == True:
+                # Only once in SE, change kinematic params
+                rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
+                #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
 
                 rospy.loginfo('Preparing image')
                 # Convert to OpenCV image in HSV
@@ -109,7 +109,7 @@ class StateEstimator(DTROS):
                 rospy.loginfo('Done #3')
 
             else:
-                break #retry
+                pass
         else:
             pass
 
@@ -145,14 +145,14 @@ class StateEstimator(DTROS):
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
         img_crop = np.sum(img[394:400,0:400]==255) #lower image part
+        #img_crop = img[394:400,0:400] #lower image part
         return img_crop
 
 
-    def blobCounter(self, img):
-        # WARNING: not robust against noise from other yellow marks (s.a. duckies)
-        # Currrently incoming TOPimage
-        self.current = np.sum(img)
+    def blobCounter(self, sum):
+        self.current = sum
         rospy.loginfo('Done #3.1')
+
         # If not black (= yellow)
         if self.current != 0: # For robustness, increase threshold if self.current > some_value:
             # Only count when discontinuity was encountered, and yellow is again True
@@ -163,11 +163,11 @@ class StateEstimator(DTROS):
                 self.go = False
                 rospy.loginfo('Reached [-- %s --] stripes, encounting ...' % str(self.number))
                 self.pub_localization.publish(self.number)
-
             else:
                 #self.go = False
                 rospy.loginfo('Huh #1')
                 pass
+
         # If black, reset trigger
         else:
             # As soon as image is not fully black anymore, start counting
