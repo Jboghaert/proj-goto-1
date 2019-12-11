@@ -39,10 +39,42 @@ The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD)
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
 ### Setting up the framework
+Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through
+```
+$ ping DUCKIEBOT_NAME.local
+```
+Then, make sure to pull the latest docker images for `dt-core`, `dt-car-interface` and `dt-duckiebot-interface` through
+```
+$ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-car-interface:daffy
+$ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-duckiebot-interface:daffy
+$ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-core:daffy
+```
+
 Include ros graph default
+
 
 ### Implementing GOTO-1
 Include ros graph with altered structure
+
+Now build the image:
+```
+$ dts devel watchtower stop -H DUCKIEBOT_NAME.local
+$ chmod +x ./packages/my_package/src/localization_node.py
+$ chmod +x ./packages/my_package/src/state_estimation.py
+$ dts devel build -f --arch arm32v7 -H DUCKIEBOT_NAME.local
+```
+Then run the GOTO-1 module, and access its root to pass the desired input commands:
+```
+$ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
+$ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
+```
+
+### Stopping procedure:
+When stopping the GOTO-1 module, do the following:
+- stop all activated and created containers in portainer, wait for the processes to finish cleanly,
+- ssh into your Duckiebot using the following command. Wait for 30 seconds before plugging out the battery.
+    `$ ssh DUCKIEBOT_NAME sudo poweroff`
+
 
 ### Important assumptions
 This code assumes the following assumptions within the Duckietown environment set-up:
@@ -61,15 +93,7 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 - [ ] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
 - [ ] Execute the cmd.txt file and change all DB dependent parameters if necessary (s.a. IP address and name)
 
-Commands:
-```
-$ dts devel watchtower stop -H *DUCKIEBOT_NAME*.local
-$ chmod +x ./packages/my_package/src/localization_node.py
-$ chmod +x ./packages/my_package/src/state_estimation.py
-$ dts devel build -f --arch arm32v7 -H *DUCKIEBOT_NAME*.local
-$ docker -H *DUCKIEBOT_NAME*.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://*DUCKIEBOT_IP*:*PORT*/ --rm --net host duckietown/*IMAGE_NAME:IMAGE_TAG* /bin/bash
-$ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
-```
+
 
 ## Troubleshooting
 As the existing framework of `indefinite_navigation` is not stable, and issues may arise within the development branch of Duckietown (`daffy`), the following may be of help:
