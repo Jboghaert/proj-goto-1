@@ -150,8 +150,8 @@ class StateEstimator(DTROS):
         return img_crop
 
 
-    def blobCounter(self, sum):
-        self.current = sum
+    def blobCounter(self, img):
+        self.current = np.sum(img)
         rospy.loginfo('Done #3.1')
 
         # If not black (= yellow)
