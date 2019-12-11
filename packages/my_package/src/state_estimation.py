@@ -35,7 +35,7 @@ class StateEstimator(DTROS):
         self.number = 0
         self.estimator = False # don't start this node unless 'True' from localization_node
         self.go = False
-        self.fsm_mode = "INTERSECTION_CONTROL" #default
+        #self.fsm_mode = "INTERSECTION_CONTROL" #default
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -52,7 +52,7 @@ class StateEstimator(DTROS):
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
         self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
-        #self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
+        #self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode)
 
         #Anti-instagram node sub (corrected, ...)
 
@@ -141,7 +141,7 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[390:400,0:400] #lower image part
+        img_crop_pub = img[390:400,:] #lower image part
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
