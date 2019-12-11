@@ -89,8 +89,8 @@ class StateEstimator(DTROS):
 
     def cbCamera(self, img):
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-        rospy.loginfo('Intersection navigation finished, going to state estimation')
-        #only do the following if self.state != intersection something
+            rospy.loginfo('Intersection navigation finished, going to state estimation')
+            #only do the following if self.state != intersection something
 
             if self.estimator == True:
                 # Only once in SE, change kinematic params
@@ -107,7 +107,6 @@ class StateEstimator(DTROS):
                 # Count number of blobs (= midline stripes)
                 self.blobCounter(sum)
                 rospy.loginfo('Done #3')
-
             else:
                 pass
         else:
