@@ -30,10 +30,7 @@ The code itself explains in- and output arguments, as well as additional, more d
 This class is imported by `localization_node` and calculates the **shortest path** given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class.
 
 #### 3. state_estimation_node
-This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes.
-
-
-
+This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
 ## Implementation prerequisites
@@ -64,6 +61,15 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 - [ ] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
 - [ ] Execute the cmd.txt file and change all DB dependent parameters if necessary (s.a. IP address and name)
 
+Commands:
+```
+$ dts devel watchtower stop -H *DUCKIEBOT_NAME*.local
+$ chmod +x ./packages/my_package/src/localization_node.py
+$ chmod +x ./packages/my_package/src/state_estimation.py
+$ dts devel build -f --arch arm32v7 -H *DUCKIEBOT_NAME*.local
+$ docker -H *DUCKIEBOT_NAME*.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://*DUCKIEBOT_IP*:*PORT*/ --rm --net host duckietown/*IMAGE_NAME:IMAGE_TAG* /bin/bash
+$ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
+```
 
 ## Troubleshooting
 As the existing framework of `indefinite_navigation` is not stable, and issues may arise within the development branch of Duckietown (`daffy`), the following may be of help:
