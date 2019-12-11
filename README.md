@@ -69,11 +69,27 @@ $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /dat
 $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 ```
 
+#https://www.w3schools.com/howto/howto_css_images_side_by_side.asp
+
+#.column {
+#float: left;
+#width: 33.33%;
+#padding: 5px;
+
+<div class="row">
+  <div class="column">
+    <img src="media/global_localization.png" alt="ROS1" style='width:50%'>
+  </div>
+  <div class="column">
+    <img src="media/state_estimation.png" alt="ROS2" style="width:50%">
+  </div>
+</div>
+
 <div figure-id="fig:global_localization">
      <img src="media/global_localization.png" style='width: 9em'/>
 </div>
 <div figure-id="fig:state_estimation">
-     <img src="media/state_estimation.png" style='width: 9em'/>
+     <img src="" style='width: 9em'/>
 </div>
 
 
