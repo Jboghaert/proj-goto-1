@@ -100,7 +100,7 @@ class LocalizationNode(DTROS):
     def cbState(self, msg):
         # Upon incoming msg, stop main callback by setting self.state = True
         self.state = True
-        rospy.loginfo('We reached now %s stripes, out of XX' %(msg.data, self.goal_discrete))
+        rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
 
         # Permanently subscribe to avoid AT cb during state_estimator from beginning, not only when final goal was reached
         if msg == self.goal_discrete: #unnecessary, is already true if there is an incoming message --> change to

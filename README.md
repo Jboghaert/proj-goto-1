@@ -99,3 +99,5 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 ## Troubleshooting
 As the existing framework of `indefinite_navigation` is not stable, and issues may arise within the development branch of Duckietown (`daffy`), the following may be of help:
 - the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal,
+- if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection, intervene using the joystick controller, or take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...),
+
