@@ -4,7 +4,7 @@
   <arg name="goal_distance" default="40"/>
 
   <group>
-    <node pkg="my_package" type="localization_node_test.py" name="localization_node_test" output="screen" args="$(arg goal_input) $(arg goal_distance)">
+    <node pkg="my_package" type="global_localization.py" name="global_localization" output="screen" args="$(arg goal_input) $(arg goal_distance)">
       <param name="goal_input" type="int" value="$(arg goal_input)" />
       <param name="goal_distance" type="int" value="$(arg goal_distance)" />
     </node>

@@ -9,6 +9,7 @@ Author: J. Boghaert
 Tutors: M. Hosner, G. Zardini
 
 Add Description & objective
+The goal of this project is to navigate a single Duckiebot within a predefined Duckietown lay-out from any starting point A to a randomly generated arrival point B.
 
 
 ## Content & pipeline structure

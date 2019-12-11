@@ -45,23 +45,24 @@ class StateEstimator(DTROS):
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # Correct trim values from terminal for state_estimation (only lane keeping)
-        #self.se_gain = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
-        #self.se_trim = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
-        #self.se_other = rospy.get_param('/%s/new_gain' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
+        #self.se_gain = rospy.get_param('/%s/new_gain' % self.node_name)
+        #self.se_trim = rospy.get_param('/%s/new_gain' % self.node_name)
+        #self.se_other = rospy.get_param('/%s/new_gain' % self.node_name)
 
-        #rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #trim value to desired velocity
+        #rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #gain value to desired velocity
         #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #trim value to desired velocity
-        #rospy.set_param('/%s/kinematics_node/other' % self.veh_name, self.se_other) #trim value to desired velocity
+        #rospy.set_param('/%s/kinematics_node/other' % self.veh_name, self.se_other) #other value to desired velocity
 
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
-        self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
+        self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
+        #self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
 
         #Anti-instagram node sub (corrected, ...)
 
         # List publishers
-        self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if nec, publish only once when goal state is reached, don't publish continuously
+        self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if necessary, don't publish continuously (requires import of goal_discrete param)
         self.pub_mask_compressed = rospy.Publisher('~/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
         self.pub_crop_compressed = rospy.Publisher('~/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
@@ -72,6 +73,11 @@ class StateEstimator(DTROS):
 
 
 # CODE GOES HERE
+
+    #def cbMode(self, mode_msg):
+        # Get FSM mode
+        #self.fsm_mode = mode_msg.state
+
 
     def cbLocalization(self, msg):
         # Keep this true, independent from new message
@@ -90,7 +96,8 @@ class StateEstimator(DTROS):
     def cbCamera(self, img):
         if self.estimator == True:
 
-            # ADD: only do the following if self.state != intersection something
+            #if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
+            #only do the following if self.state != intersection something
 
             rospy.loginfo('Preparing image')
             # Convert to OpenCV image in HSV
@@ -102,8 +109,7 @@ class StateEstimator(DTROS):
             # Count number of blobs (= midline stripes)
             self.blobCounter(sum)
             rospy.loginfo('Done #3')
-            # Stop when threshold is reached
-            #return self.number
+
         else:
             pass
 
@@ -122,8 +128,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries
-        lower_yellow = np.array([25, 80, 180]) #np.uint8
-        upper_yellow = np.array([30, 255, 255]) #np.uint8
+        lower_yellow = np.array([27, 80, 180]) #np.uint8
+        upper_yellow = np.array([29, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only
@@ -134,11 +140,11 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[390:400,:] #ipv 38:40
+        img_crop_pub = img[390:400,0:320] #ipv 38:40
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a 2px high image
-        img_crop = np.sum(img[38:40,:]==255) #255?
+        img_crop = np.sum(img[398:400,:]==255) #255?
         return img_crop
 
 

@@ -44,8 +44,8 @@ class AmodAnalyzer(DTROS):
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # List subscribers
-        self.sub_localization = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbLoc)
-        self.sub_state_estimator = rospy.Subscriber('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, self.cbSE)
+        self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLoc)
+        self.sub_state_estimator = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbSE)
         self.sub_wheel_actuation = rospy.Subscriber('something' % self.veh_name, BoolStamped, self.cbVel)
 
         # Conclude

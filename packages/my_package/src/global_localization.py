@@ -48,7 +48,7 @@ class LocalizationNode(DTROS):
         super(LocalizationNode, self).__init__(node_name=node_name)
 
         # Initialize variables
-        self.node_name = "localization_node_test"
+        self.node_name = "global_localization"
         self.veh_name = os.environ['VEHICLE_NAME']
         # Related to path planning
         self.AT = False #start localization or not
@@ -89,7 +89,7 @@ class LocalizationNode(DTROS):
         self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
         self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
         #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
-        self.pub_state_estimator = rospy.Publisher('/%s/localization_node_test/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
+        self.pub_state_estimator = rospy.Publisher('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
