@@ -16,15 +16,15 @@
       <param name="goal_input" type="int" value="$(arg goal_input)" />
       <param name="goal_distance" type="int" value="$(arg goal_distance)" />
 
-      <param name="inter_nav_ff_left" type="float" value="$(arg inter_nav_ff_left)" />
-      <param name="inter_nav_ff_right" type="float" value="$(arg inter_nav_ff_right)" />
-      <param name="inter_nav_time_left_turn" type="float" value="$(arg inter_nav_time_left_turn)" />
-      <param name="inter_nav_time_right_turn" type="float" value="$(arg inter_nav_time_right_turn)" />
+      <param name="inter_nav_ff_left" value="$(arg inter_nav_ff_left)" />
+      <param name="inter_nav_ff_right" value="$(arg inter_nav_ff_right)" />
+      <param name="inter_nav_time_left_turn" value="$(arg inter_nav_time_left_turn)" />
+      <param name="inter_nav_time_right_turn" value="$(arg inter_nav_time_right_turn)" />
 
     </node>
     <node pkg="my_package" type="state_estimation.py" name="state_estimation" output="screen" args="$(arg new_gain)">
 
-      <param name="new_gain" type="float" value="$(arg new_gain)" />
+      <param name="new_gain" value="$(arg new_gain)" />
 
     </node>
   </group>

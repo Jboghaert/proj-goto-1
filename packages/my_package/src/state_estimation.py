@@ -140,11 +140,11 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[390:400,0:320] #ipv 38:40
+        img_crop_pub = img[390:400,0:400] #lower image part
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
-        img_crop = np.sum(img[394:400,0:400]==255) #255?
+        img_crop = np.sum(img[394:400,0:400]==255) #lower image part
         return img_crop
 
 
