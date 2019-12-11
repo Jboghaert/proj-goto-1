@@ -74,19 +74,20 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 <head>
 <style>
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .column {
-    float: left;
-    width: 50%;
-    padding: 5px;
+  float: left;
+  width: 50%;
+  padding: 5px;
 }
 
+/* Clearfix (clear floats) */
 .row::after {
-    content: "";
-    clear: both;
-    display: table;
+  content: "";
+  clear: both;
+  display: table;
 }
 </style>
 </head>
@@ -103,6 +104,7 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 
 </body>
 </html>
+
 
 
 
