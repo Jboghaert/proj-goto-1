@@ -73,7 +73,10 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 <html>
 <head>
 <style>
-* {box-sizing: border-box;}
+* {
+  box-sizing:
+  border-box;
+}
 
 .column {float: left;
   width: 50%;
