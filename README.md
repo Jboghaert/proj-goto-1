@@ -12,15 +12,16 @@ Add Description & objective
 
 
 # Content & pipeline structure
-Within the `packages/my_package/src` directory, 2 ROS nodes and an external class for path planning can be found.
+Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. 
 
 <div figure-id="fig:pipeline_vis">
      <img src="media/pipeline_vis.png" style='width: 20em'/>
 </div>
 
+**Legenda:** Unmarked inputs are given or self-determined, grey-marked blocks are running in the existing framework of `indefinite_navigation`, and grey-marked items within a blue box represent the custom blocks developed for GOTO-1.
 
 #### 1. localization_node
-This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of proj-goto-1 and generates the desired turn commands at each intersection. The driving input of this code are the intersection AT's.
+This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of GOTO-1 and generates the desired turn commands at each intersection, as well as the stop command upon arrival. The driving input of this code are the intersection AT's, serving as nodes for the `path_planning_class` outlined next.
 
 **Note:**
 The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
