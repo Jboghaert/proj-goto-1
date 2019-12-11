@@ -35,6 +35,7 @@ class StateEstimator(DTROS):
         self.number = 0
         self.estimator = False # don't start this node unless 'True' from localization_node
         self.go = False
+        self.fsm_mode = "INTERSECTION_CONTROL" #default
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -89,10 +90,11 @@ class StateEstimator(DTROS):
 
     def cbCamera(self, img):
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-            rospy.loginfo('Intersection navigation finished, going to state estimation')
             #only do the following if self.state != intersection something
 
             if self.estimator == True:
+                rospy.loginfo('Intersection navigation finished, going to state estimation')
+
                 # Only once in SE, change kinematic params
                 rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
                 #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
