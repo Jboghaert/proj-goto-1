@@ -49,7 +49,7 @@ Build ind_nav demo without random_april_tag_turns_node:
 
 Run test module (subset of goto-1 solution) in another terminal window:
     $ dts devel watchtower stop -H maserati4pgts.local
-    $ chmod +x ./packages/my_package/src/localization_node_test.py
+    $ chmod +x ./packages/my_package/src/global_localization.py
     $ chmod +x ./packages/my_package/src/state_estimation.py
     $ dts devel build -f --arch arm32v7 -H maserati4pgts.local
 

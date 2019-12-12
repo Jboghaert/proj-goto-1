@@ -42,8 +42,23 @@ The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD)
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
+
+## Prerequisites and assumptions
+The GOTO-1 package assumes the following assumptions within the Duckietown environment set-up:
+- DT map as hardcoded in `path_planning_class`,
+- no other AT's present as the ones hardcoded in `path_planning_class`,
+- no varying lighting conditions,
+- no external factors (s.a. obstacles on the roads),
+- an acceptably functioning `indefinite_navigation` demo version with ROS graph as attached.
+
+In addition, in order to function properly and start using the ([daffy](https://docs.duckietown.org/daffy/index.html)) Duckietown-environment in the first place, GOTO-1 requires the following:
+- a well calibrated Duckiebot, i.e. [wheel calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/wheel_calibration.html) and [camera calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/camera_calib.html),
+- a well set-up laptop (preferable Ubuntu), further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/laptop_setup.html),
+- a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html).
+
+
 ## Setting up the framework
-Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through
+Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through:
 ```
 $ ping DUCKIEBOT_NAME.local
 ```
@@ -59,14 +74,14 @@ As outlined in the command [file](https://github.com/duckietown-ethz/proj-goto-1
 ```
 $ docker -H DUCKIEBOT_NAME.local run -it --name dt-core-goto1 -v /data:/data --privileged --rm --net host duckietown/dt-core:daffy /bin/bash
 ```
-Then, once inside the root, navigate to the `` directory and then install the text editor *vim* to change the boolean value within the correct file.
+Then, once inside the root, navigate to the `packages/duckietown_demos/launch` directory and then install the text editor *vim* to change the boolean value within the correct file.
 ```
 $ cd packages/duckietown_demos/launch
 $ apt-get update
 $ apt-get install vim
 $ vim indefinite_navigation.launch
 ```
-Once inside the file, press *i* to edit, and *:wq* to close and save the file. Then, launch the altered `indefinite_navigation`:
+Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to close and save the file. Then, launch the altered `indefinite_navigation`:
 ```
 $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
 ```
@@ -75,8 +90,6 @@ $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
 
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
-
-Include ros graph default
 
 
 ## Implementing GOTO-1
@@ -91,8 +104,10 @@ $ dts devel build -f --arch arm32v7 -H DUCKIEBOT_NAME.local
 Then run the GOTO-1 module, and access its root to pass the desired input commands:
 ```
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
-$ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
+$ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_gain:="0.5" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
 ```
+
+**Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch).
 
 <div class="row">
   <div class="column">
@@ -102,18 +117,10 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 
 ## Stopping procedure:
 When stopping the GOTO-1 module, do the following:
-- stop all activated and created containers in portainer, wait for the processes to finish cleanly,
+- close all auxiliary terminals you might have used (s.a. joystick control, start_gui_tools, rviz, ...),
+- stop all activated and created containers in portainer (accessed through *"DUCKIEBOT_NAME.local:9000/#/containers"*), wait for the processes to finish cleanly,
 - ssh into your Duckiebot using the following command. Wait for 30 seconds before plugging out the battery.
 `$ ssh DUCKIEBOT_NAME sudo poweroff`
-
-
-## Important assumptions
-This code assumes the following assumptions within the Duckietown environment set-up:
-- DT map as hardcoded in `path_planning_class`,
-- no other AT's present as the ones hardcoded in `path_planning_class`,
-- no varying lighting conditions,
-- no external factors (s.a. obstacles on the roads),
-- an acceptably functioning `indefinite_navigation` demo version with ROS graph as attached.
 
 
 # Running GOTO-1
@@ -134,5 +141,7 @@ As the existing framework of `indefinite_navigation` is not stable, and issues m
 - if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection:
     - intervene using the joystick controller
     - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...)
-- other
 
+Other helpful links:
+- issues regarding the set-up of your Duckiebot: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_troubleshooting.html#part:setup-troubleshooting)
+- issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
