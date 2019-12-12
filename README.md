@@ -72,12 +72,8 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
 
 <div class="row">
   <div class="column">
-    <img src="media/global_localization.png" alt="ROS1" style='width:100%'>
+    <img src="media/ros_nodes.png" alt="ros_nodes" style='width:100%'>
   </div>
-  <div class="column">
-    <img src="media/state_estimation.png" alt="ROS2" style="width:100%">
-  </div>
-</div>
 
 
 ### Stopping procedure:
