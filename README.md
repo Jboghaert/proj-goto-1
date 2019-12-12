@@ -37,13 +37,13 @@ For the path planning, the class uses a Dijkstra algortihm to define. Dijkstra !
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
-# Implementation prerequisites
+# Implementation
 The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros).
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
 
-## Prerequisites and assumptions
+## 1. Prerequisites and assumptions
 The GOTO-1 package assumes the following assumptions within the Duckietown environment set-up:
 - DT map as hardcoded in `path_planning_class`,
 - no other AT's present as the ones hardcoded in `path_planning_class`,
@@ -57,7 +57,7 @@ In addition, in order to function properly and start using the ([daffy](https://
 - a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html).
 
 
-## Setting up the framework
+## 2. Setting up the framework
 Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through:
 ```
 $ ping DUCKIEBOT_NAME.local
@@ -92,7 +92,7 @@ $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
 
 
 
-## Implementing GOTO-1
+## 3. Implementing GOTO-1
 
 Now build the image:
 ```
@@ -106,8 +106,10 @@ Then run the GOTO-1 module, and access its root to pass the desired input comman
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_gain:="0.5" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
 ```
+Once up and running, your ROS graph image should display something like the image below.
 
-**Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch).
+**Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
+
 
 <div class="row">
   <div class="column">
@@ -115,7 +117,7 @@ $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" 
   </div>
 
 
-## Stopping procedure:
+## 4. Stopping procedure:
 When stopping the GOTO-1 module, do the following:
 - close all auxiliary terminals you might have used (s.a. joystick control, start_gui_tools, rviz, ...),
 - stop all activated and created containers in portainer (accessed through *"DUCKIEBOT_NAME.local:9000/#/containers"*), wait for the processes to finish cleanly,
