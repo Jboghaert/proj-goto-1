@@ -95,6 +95,7 @@ class StateEstimator(DTROS):
                 # Only once in SE, limit linear velocity during last mile
                 # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
                 rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
+                rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.55)
                 rospy.loginfo('Preparing image')
 
                 # Convert to OpenCV image in HSV
@@ -137,11 +138,11 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[404:410,:] #lower image part
+        img_crop_pub = img[407:410,:] #lower image part
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
-        img_crop_sum = np.sum(img[408:410,0:400]) #lower image part
+        img_crop_sum = np.sum(img[407:410,0:400]) #lower image part
         #img_crop = img[394:400,0:400] #lower image part
         return img_crop_sum
 

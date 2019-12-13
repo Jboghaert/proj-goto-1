@@ -129,6 +129,7 @@ class LocalizationNode(DTROS):
             rospy.loginfo('You have reached your destination')
             #stop StateEstimator
             self.estimation = False
+            self.state = False
             self.publishTrigger(self.estimation)
             #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
