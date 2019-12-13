@@ -77,8 +77,8 @@ class StateEstimator(DTROS):
 
     def cbLocalization(self, msg):
         # Keep this true, independent from new message
-        self.estimator = msg
-
+        self.estimator = msg.data
+        rospy.loginfo('Trigger = %s' %msg.data)
         # WARNING: only update image here (else all camera feed for all nodes is of low quality)
         # Ensure optimal computation, rescale image
         #rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
