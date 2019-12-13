@@ -45,7 +45,7 @@ class StateEstimator(DTROS):
         # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 25.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
         # Correct param values from terminal for state_estimation (only lane keeping)
         self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
 
@@ -62,7 +62,7 @@ class StateEstimator(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        rospy.Rate(25)
+        rospy.Rate(30)
         self.bridge = CvBridge()
 
 
@@ -137,12 +137,12 @@ class StateEstimator(DTROS):
 
 
     def imageSplitter(self, img):
-        # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[407:410,:] #lower image part
+        # For inspection only
+        img_crop_pub = img[408:410,0:400] #lower image part
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
-        img_crop_sum = np.sum(img[407:410,0:400]) #lower image part
+        img_crop_sum = np.sum(img[408:410,0:400]) #lower image part
         #img_crop = img[394:400,0:400] #lower image part
         return img_crop_sum
 
