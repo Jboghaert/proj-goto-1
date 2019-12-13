@@ -45,9 +45,8 @@ class StateEstimator(DTROS):
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
-        # Correct trim values from terminal for state_estimation (only lane keeping)
-        self.se_gain = rospy.get_param('/%s/new_gain' % self.node_name) #default = 0.5
-        #self.se_trim = rospy.get_param('/%s/new_trim' % self.node_name)
+        # Correct param values from terminal for state_estimation (only lane keeping)
+        self.se_v_bar = rospy.get_param('/%s/new_gain' % self.node_name) # Default is 0.23
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
@@ -63,7 +62,6 @@ class StateEstimator(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        #self.rate = rospy.Rate(40)
         rospy.Rate(40)
         self.bridge = CvBridge()
 
@@ -96,17 +94,15 @@ class StateEstimator(DTROS):
         if self.estimator == True:
             rospy.loginfo('Intersection navigation finished, going to state estimation')
 
-            # Only once in SE, change kinematic params
-            rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, self.se_gain) #desired gain during last mile
-            #rospy.set_param('/%s/kinematics_node/trim' % self.veh_name, self.se_trim) #desired trim value
+            # Only once in SE, limit linear velocity during last mile
+            # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
+            rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
 
             rospy.loginfo('Preparing image')
             # Convert to OpenCV image in HSV
             img = self.colourConverter(self.imageConverter(img))
-            #rospy.loginfo('Done #1')
             # Extract necessary image part, sum HSV values
             sum = self.imageSplitter(img)
-            #rospy.loginfo('Done #2')
             # Count number of blobs (= midline stripes)
             self.blobCounter(sum)
             rospy.loginfo('Done #3')
