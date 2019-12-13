@@ -72,3 +72,11 @@ Start indefinite_navigation via joystick keyboard_control
     $ dts duckiebot keyboard_control maserati4pgts
     # or
     $ dts duckiebot keyboard_control maserati4pgts --base_image duckietown/dt-core:daffy-amd64
+
+
+Run the following container to adjust the params for lane_controlling during run_time from /bin/bash:
+    $ docker run -it --rm  -e ROS_MASTER_URI="http://DUCKIEBOT_IP=192.168.1.116:11311/" duckietown/dt-ros-commons:daffy-amd64 /bin/bash
+    # inside the root, do
+    $ rosparam list
+    $ rosparam get /directory/path/file
+    $ rosparam set /directory/path/file 0.6

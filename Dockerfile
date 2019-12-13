@@ -7,6 +7,7 @@ ARG ARCH=arm32v7
 ARG MAJOR=daffy
 ARG BASE_TAG=${MAJOR}-${ARCH}
 ARG BASE_IMAGE=dt-ros-commons
+# Change the BASE_IMAGE back to dt-ros-commons if not implemented within dt-core
 
 # define base image
 FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
