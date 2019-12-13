@@ -130,10 +130,10 @@ class LocalizationNode(DTROS):
             #stop StateEstimator
             self.estimation = False
             self.publishTrigger(self.estimation)
-            #say goodbyes
+            #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
             self.publishJoy()
-            self.on_shutdown() # shutdown node, unnecessary
+            #self.on_shutdown()
         else:
             pass
 
