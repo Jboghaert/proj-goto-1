@@ -103,10 +103,10 @@ class StateEstimator(DTROS):
             rospy.loginfo('Preparing image')
             # Convert to OpenCV image in HSV
             img = self.colourConverter(self.imageConverter(img))
-            rospy.loginfo('Done #1')
+            #rospy.loginfo('Done #1')
             # Extract necessary image part, sum HSV values
             sum = self.imageSplitter(img)
-            rospy.loginfo('Done #2')
+            #rospy.loginfo('Done #2')
             # Count number of blobs (= midline stripes)
             self.blobCounter(sum)
             rospy.loginfo('Done #3')
@@ -153,7 +153,7 @@ class StateEstimator(DTROS):
 
     def blobCounter(self, sum):
         self.current = sum
-        rospy.loginfo('Done #3.1')
+        #rospy.loginfo('Done #3.1')
 
         # If not black (= yellow)
         if self.current != 0: # For robustness, increase threshold if self.current > some_value:
@@ -173,7 +173,7 @@ class StateEstimator(DTROS):
         # If black, reset trigger
         else:
             # As soon as image is not fully black anymore, start counting
-            rospy.loginfo('Done #3.2')
+            #rospy.loginfo('Done #3.2')
             self.go = True
 
 

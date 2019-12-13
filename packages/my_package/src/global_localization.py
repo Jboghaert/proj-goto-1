@@ -114,7 +114,7 @@ class LocalizationNode(DTROS):
         rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
 
         # Permanently subscribe to avoid AT cb during state_estimator from beginning, not only when final goal was reached
-        if msg >= self.goal_discrete:
+        if msg.data >= self.goal_discrete:
             #stop DB
             self.publishStop()
             rospy.loginfo('You have reached your destination')
