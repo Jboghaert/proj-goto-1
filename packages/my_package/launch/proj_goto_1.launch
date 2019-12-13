@@ -3,6 +3,7 @@
   <arg name="goal_input" default="231"/>
   <arg name="goal_distance" default="40"/>
   <arg name="new_v_bar" default="0.23"/>
+  <arg name="se_switch" default="True"/>
 
   <arg name="inter_nav_ff_left" default="0.4"/>
   <arg name="inter_nav_ff_right" default="-0.6"/>
@@ -11,10 +12,11 @@
 
 
   <group>
-    <node pkg="my_package" type="global_localization.py" name="global_localization" output="screen" args="$(arg goal_input) $(arg goal_distance) $(arg inter_nav_ff_left) $(arg inter_nav_ff_right) $(arg inter_nav_time_left_turn) $(arg inter_nav_time_right_turn)">
+    <node pkg="my_package" type="global_localization.py" name="global_localization" output="screen" args="$(arg goal_input) $(arg goal_distance) $(arg se_switch) $(arg inter_nav_ff_left) $(arg inter_nav_ff_right) $(arg inter_nav_time_left_turn) $(arg inter_nav_time_right_turn)">
 
       <param name="goal_input" type="int" value="$(arg goal_input)" />
       <param name="goal_distance" type="int" value="$(arg goal_distance)" />
+      <param name="se_switch" type="bool" value="$(arg se_switch)" />
 
       <param name="inter_nav_ff_left" value="$(arg inter_nav_ff_left)" />
       <param name="inter_nav_ff_right" value="$(arg inter_nav_ff_right)" />

@@ -61,8 +61,8 @@ Run test module (subset of goto-1 solution) in another terminal window:
     # or
     $ roslaunch my_package proj_goto_1.launch goal_input:="11" goal_distance:="60" new_v_bar:="0.12"
     # if desired, add the following to the above command in order to tune the intersection navigation (default values lister here and in .launch file)
-    # inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
-    # Ignore: robot_name:="maserati4pgts"
+    # se_switch:="True" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
+    # ignore: robot_name:="maserati4pgts"
 
 
 To see rqt graph (check if all connections are made):

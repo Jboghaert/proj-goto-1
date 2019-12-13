@@ -75,6 +75,9 @@ class LocalizationNode(DTROS):
         self.goal_distance = rospy.get_param('/%s/goal_distance' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
         self.goal_discrete = int(self.goal_distance / self.stripe_length) + 2 # discretize length in cm to number of stripes, +2 to compensate view/delay for actual position
 
+        # Decide to either have the StateEstimator by counting stripes (requires stable ind nav) or by feedforward timing, based on gain and v_bar values
+        self.se_switch = rospy.get_param('/%s/se_switch' % self.node_name) #true = switch to SE(counter), false = switch to SE(timer)
+
         # Import PathPlanner class as pp
         self.pp = PathPlanner()
         self.tags = self.pp.tags
