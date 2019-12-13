@@ -35,7 +35,7 @@ class StateEstimator(DTROS):
         self.number = 0
         self.estimator = False # don't start this node unless 'True' from localization_node
         self.go = False
-        #self.fsm_mode = "INTERSECTION_CONTROL" #default
+        self.fsm_mode = "INTERSECTION_CONTROL" #default, resolves issue if cbLocalization happens before cbMode
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
@@ -62,7 +62,7 @@ class StateEstimator(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        rospy.Rate(40)
+        rospy.Rate(25)
         self.bridge = CvBridge()
 
 
@@ -125,8 +125,8 @@ class StateEstimator(DTROS):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # Set boundaries (filter out exact HSV values for midline stripes)
-        lower_yellow = np.array([30, 80, 180]) #np.uint8
-        upper_yellow = np.array([32, 255, 255]) #np.uint8
+        lower_yellow = np.array([29, 80, 180]) #np.uint8
+        upper_yellow = np.array([33, 255, 255]) #np.uint8
         mask_yellow = cv2.inRange(imgHSV, lower_yellow, upper_yellow)
 
         # Output yellow/black image only
@@ -137,11 +137,11 @@ class StateEstimator(DTROS):
 
     def imageSplitter(self, img):
         # Publish cropped mask for inspection and tuning of the above interval and framerate
-        img_crop_pub = img[406:410,:] #lower image part
+        img_crop_pub = img[404:410,:] #lower image part
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum hsv values over a few px high image, take out noise from right side (duckies)
-        img_crop_sum = np.sum(img[406:410,0:400]) #lower image part
+        img_crop_sum = np.sum(img[408:410,0:400]) #lower image part
         #img_crop = img[394:400,0:400] #lower image part
         return img_crop_sum
 

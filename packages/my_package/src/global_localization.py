@@ -112,7 +112,7 @@ class LocalizationNode(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        self.rate = rospy.Rate(15)
+        self.rate = rospy.Rate(25)
 
 
 # CODE GOES HERE
