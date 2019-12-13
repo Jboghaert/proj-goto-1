@@ -46,7 +46,7 @@ class StateEstimator(DTROS):
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
 
         # Correct param values from terminal for state_estimation (only lane keeping)
-        self.se_v_bar = rospy.get_param('/%s/new_gain' % self.node_name) # Default is 0.23
+        self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
