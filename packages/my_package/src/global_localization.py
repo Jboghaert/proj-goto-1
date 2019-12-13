@@ -37,6 +37,8 @@ from std_msgs.msg import Int16
 from sensor_msgs.msg import CompressedImage
 from duckietown_msgs.msg import WheelsCmdStamped
 
+from sensor_msgs.msg import Joy
+
 from path_planning_class import PathPlanner
 
 
@@ -88,6 +90,8 @@ class LocalizationNode(DTROS):
         rospy.set_param('/%s/unicorn_intersection_node/time_left_turn' % self.veh_name, self.time_l_turn)
         rospy.set_param('/%s/unicorn_intersection_node/time_right_turn' % self.veh_name, self.time_r_turn)
 
+        rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.66) #default gain = 0.66
+
 
         # List subscribers
         self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback) #from apriltags_postprocessing_node
@@ -97,9 +101,10 @@ class LocalizationNode(DTROS):
         # List publishers
         self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
         self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
-        #self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
+        self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # stop the DB (automated)
         #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
         self.pub_state_estimator = rospy.Publisher('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
+        #self.pub_override_joystick = rospy.Publisher('/%s/joy' % self.veh_name, Joy, queue_size = 1) # necessary?
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -121,9 +126,10 @@ class LocalizationNode(DTROS):
             #stop StateEstimator
             self.estimation = False
             self.publishTrigger(self.estimation)
-            #say goodbye
+            #say goodbyes
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
-            self.onShutdown()
+            self.publishJoy()
+            self.on_shutdown() # shutdown node, unnecessary
         else:
             pass
 
@@ -341,11 +347,20 @@ class LocalizationNode(DTROS):
         self.pub_wheels_cmd.publish(stop_cmd)
         rospy.loginfo("Published stop_cmd")
 
+    def publishJoy(self):
+        # see joy_mapper_node
+        override = BoolStamped()
+        override.data = True
+        rospy.loginfo('override = True')
+        self.pub_override_joystick.publish(override)
+
 
 # SAFETY & EMERGENCY
     def on_shutdown(self):
         self.publishStop()
-        rospy.loginfo("[%s] Shutting down." % (self.node_name)) #correct?
+        rospy.loginfo("[%s] Shutting down." % (self.node_name))
+        self.onShutdown()
+
 
 
 # KEEP NODE ALIVE
