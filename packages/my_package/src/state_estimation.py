@@ -40,20 +40,20 @@ class StateEstimator(DTROS):
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
+
+        # DEMO SPECIFIC
         # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
-
         # Correct param values from terminal for state_estimation (only lane keeping)
         self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
+
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
         self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLocalization)
-        #self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode)
-
-        #Anti-instagram node sub (corrected, ...)
+        self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode)
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if necessary, don't publish continuously (requires import of goal_discrete param)
@@ -68,9 +68,9 @@ class StateEstimator(DTROS):
 
 # CODE GOES HERE
 
-    #def cbMode(self, mode_msg):
+    def cbMode(self, mode_msg):
         # Get FSM mode
-        #self.fsm_mode = mode_msg.state
+        self.fsm_mode = mode_msg.state
 
 
     def cbLocalization(self, msg):
@@ -88,28 +88,28 @@ class StateEstimator(DTROS):
 
 
     def cbCamera(self, img):
-        #if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-        #    #only do the following if self.state != intersection something
+        # Only start estimator once intersection action is over
+        if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
 
-        if self.estimator == True:
-            rospy.loginfo('Intersection navigation finished, going to state estimation')
+            if self.estimator == True:
+                rospy.loginfo('Intersection navigation finished, going to state estimation')
 
-            # Only once in SE, limit linear velocity during last mile
-            # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
-            rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
+                # Only once in SE, limit linear velocity during last mile
+                # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
+                rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
 
-            rospy.loginfo('Preparing image')
-            # Convert to OpenCV image in HSV
-            img = self.colourConverter(self.imageConverter(img))
-            # Extract necessary image part, sum HSV values
-            sum = self.imageSplitter(img)
-            # Count number of blobs (= midline stripes)
-            self.blobCounter(sum)
-            rospy.loginfo('Done #3')
+                rospy.loginfo('Preparing image')
+                # Convert to OpenCV image in HSV
+                img = self.colourConverter(self.imageConverter(img))
+                # Extract necessary image part, sum HSV values
+                sum = self.imageSplitter(img)
+                # Count number of blobs (= midline stripes)
+                self.blobCounter(sum)
+                rospy.loginfo('Done #3')
+            else:
+                pass
         else:
             pass
-        #else:
-        #    pass
 
 
     def imageConverter(self, img):
@@ -152,7 +152,8 @@ class StateEstimator(DTROS):
         #rospy.loginfo('Done #3.1')
 
         # If not black (= yellow)
-        if self.current != 0: # For robustness, increase threshold if self.current > some_value:
+        if self.current != 0: # For robustness, increase threshold "if self.current > some_value":
+
             # Only count when discontinuity was encountered, and yellow is again True
             rospy.loginfo('Encountered fully black image from mask')
             if self.go == True:
@@ -169,7 +170,6 @@ class StateEstimator(DTROS):
         # If black, reset trigger
         else:
             # As soon as image is not fully black anymore, start counting
-            #rospy.loginfo('Done #3.2')
             self.go = True
 
 
