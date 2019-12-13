@@ -57,8 +57,10 @@ Run test module (subset of goto-1 solution) in another terminal window:
     $ docker -H maserati4pgts.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP=192.168.1.116:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 
     Within /bin/bash run the following (if not, default value will be used as defined in localization_node_test.launch):
-    $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_v_bar:="0.23" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
-    #Ignore: robot_name:="maserati4pgts"
+    $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_v_bar:="0.15"
+    # if desired, add the following to the above command in order to tune the intersection navigation (default values lister here and in .launch file)
+    # inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
+    # Ignore: robot_name:="maserati4pgts"
 
 
 To see rqt graph (check if all connections are made):

@@ -92,13 +92,11 @@ class StateEstimator(DTROS):
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
 
             if self.estimator == True:
-                rospy.loginfo('Intersection navigation finished, going to state estimation')
-
                 # Only once in SE, limit linear velocity during last mile
                 # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
                 rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
-
                 rospy.loginfo('Preparing image')
+
                 # Convert to OpenCV image in HSV
                 img = self.colourConverter(self.imageConverter(img))
                 # Extract necessary image part, sum HSV values
@@ -106,6 +104,7 @@ class StateEstimator(DTROS):
                 # Count number of blobs (= midline stripes)
                 self.blobCounter(sum)
                 rospy.loginfo('Done #3')
+
             else:
                 pass
         else:
