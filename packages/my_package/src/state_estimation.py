@@ -41,7 +41,7 @@ class StateEstimator(DTROS):
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
 
-        # DEMO SPECIFIC
+        # DEMO SPECIFIC PARAMETER TUNING
         # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px

@@ -81,7 +81,7 @@ class LocalizationNode(DTROS):
         self.graph = self.pp.graph
 
 
-        # DEMO SPECIFIC
+        # DEMO SPECIFIC PARAMETER TUNING
         # Adjustment for intersection navigation (passed from terminal) - could also be done by remapping in launch file (hardcoded)
         self.ff_left = rospy.get_param('/%s/inter_nav_ff_left' % self.node_name) #default = 0.4
         self.ff_right = rospy.get_param('/%s/inter_nav_ff_right' % self.node_name) #default = -0.6
