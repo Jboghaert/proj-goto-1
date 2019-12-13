@@ -73,7 +73,7 @@ class LocalizationNode(DTROS):
         # Get arrival point (from roslaunch/docker cmd setting the parameter 'goal_input' in terminal)
         self.goal = rospy.get_param('/%s/goal_input' % self.node_name) # of type final AT id [int32]
         self.goal_distance = rospy.get_param('/%s/goal_distance' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
-        self.goal_discrete = int(self.goal_distance / self.stripe_length) + 3 # discretize length in cm to number of stripes, +3 to compensate view/delay for actual position
+        self.goal_discrete = int(self.goal_distance / self.stripe_length) + 2 # discretize length in cm to number of stripes, +2 to compensate view/delay for actual position
 
         # Import PathPlanner class as pp
         self.pp = PathPlanner()
@@ -191,7 +191,7 @@ class LocalizationNode(DTROS):
                             path, self.cmd = self.pathPlanning(trigger, starting_point)
 
                             # Take out the goal_input AT, which was only used to get all turn_cmds
-                            path.pop() # take out last AT entry (only necessary to calculate turn_cmds)
+                            path.pop() # take out last AT entry (only necessary to calculate turn_cmds as it specified the final lane)
                             self.full_path = path # fixed
                             self.path = path # updated throughout script
 

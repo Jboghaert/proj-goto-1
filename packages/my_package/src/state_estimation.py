@@ -56,7 +56,7 @@ class StateEstimator(DTROS):
         self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode)
 
         # List publishers
-        self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1) #if necessary, don't publish continuously (requires import of goal_discrete param)
+        self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1)
         self.pub_mask_compressed = rospy.Publisher('/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
         self.pub_crop_compressed = rospy.Publisher('/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
@@ -74,7 +74,7 @@ class StateEstimator(DTROS):
 
 
     def cbLocalization(self, msg):
-        # Keep this true, independent from new message
+        # Set trigger
         self.estimator = msg.data
         rospy.loginfo('Trigger = %s' %msg.data)
         # WARNING: only update image here (else all camera feed for all nodes is of low quality)

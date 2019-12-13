@@ -22,18 +22,24 @@ Within the `packages/my_package/src` directory, all nodes and external classes f
 
 **Legenda:** Unmarked inputs are given or self-determined, yellow blocks are running in the existing framework of `indefinite_navigation`, and orange/grey-marked items represent the custom blocks developed for GOTO-1.
 
-## 1. global_localization_node
+## 1. Input parameters
+- `goal_input`: of type `tag_id`, this defines the final lane of the arrival point / the final lane the DB should be in upon Shutdown,
+- `goal_distance`: of type `int`, this specifies the distance between the last intersection the DB will pass and the arrival point B,
+
+All other values are tuning values to finetune the DB behaviour during `indefinite_navigation` that can be passed from the terminal. Default values for these parameters are defined in the .launch file of GOTO-1.
+
+## 2. global_localization_node
 This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of GOTO-1 and generates the desired turn commands at each intersection, as well as the stop command upon arrival. The driving input of this code are the intersection AT's, serving as nodes for the `path_planning_class` outlined next.
 
 **Note:**
 The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
 
-## 2. path_planning_class
+## 3. path_planning_class
 This class is imported by `localization_node` and calculates the **shortest path** given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class, and should be adapted to the actual Duckietown you want to use.
 
 For the path planning, the class uses a Dijkstra algortihm to define. Dijkstra !! No U-turns allowed
 
-## 3. state_estimation_node
+## 4. state_estimation_node
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
