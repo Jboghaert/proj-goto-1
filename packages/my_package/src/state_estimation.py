@@ -77,7 +77,7 @@ class StateEstimator(DTROS):
 
     def cbLocalization(self, msg):
         # Keep this true, independent from new message
-        self.estimator = True
+        self.estimator = msg
 
         # WARNING: only update image here (else all camera feed for all nodes is of low quality)
         # Ensure optimal computation, rescale image

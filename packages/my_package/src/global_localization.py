@@ -97,7 +97,7 @@ class LocalizationNode(DTROS):
         # List publishers
         self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
         self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
-        self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
+        #self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # necessary?
         #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
         self.pub_state_estimator = rospy.Publisher('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
 
@@ -114,7 +114,7 @@ class LocalizationNode(DTROS):
         rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
 
         # Permanently subscribe to avoid AT cb during state_estimator from beginning, not only when final goal was reached
-        if msg == self.goal_discrete: #unnecessary, is already true if there is an incoming message --> change to
+        if msg >= self.goal_discrete:
             #stop DB
             self.publishStop()
             rospy.loginfo('You have reached your destination')
@@ -123,7 +123,7 @@ class LocalizationNode(DTROS):
             self.publishTrigger(self.estimation)
             #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
-            #self.onShutdown()
+            self.onShutdown()
         else:
             pass
 
@@ -168,7 +168,7 @@ class LocalizationNode(DTROS):
                 if idx_min != -1:
                     taginfo = (msg.infos)[idx_min]
 
-                    # first AT - localize and generate path
+                    # upon first AT - localize and generate path
                     if self.plan == True:
                         rospy.loginfo('Starting detection if AT is readible')
                         trigger, starting_point = self.detection(msg)
@@ -204,7 +204,7 @@ class LocalizationNode(DTROS):
                                 rospy.loginfo('Check this out: unexpected/unidentified behaviour #1')
                                 self.publishStop()
 
-                    # next AT - execute generated path
+                    # upon all next AT's - execute generated path
                     else:
                         rospy.loginfo('Starting detection if next AT is next in path sequence')
                         trigger = self.executeFilter(msg)
