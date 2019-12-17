@@ -30,9 +30,35 @@ from path_planning_class import PathPlanner
 
 # INITIATE DTROS CLASS (incl sub/pub)
 class LocalizationNode(DTROS):
+    """Handles the localization, shortest path execution and last mile problem (stop) of GOTO-1.
+
+    The node runs in parallel to `indefinite_navigation` and takes the detected AT to firstly localize
+    (and pass this to path_planning_class) and subsequently pass the desired turn commands. Also, it
+    stops the Duckiebot once the final arrival point has been reached by overriding the joystick cmd.
+
+    The configuration parameters can be passed from the terminal (in which case they will be activated
+    at only the right time) or can be changed during run-time using the 'rosparam set' cmd.
+
+    Configuration:
+        ~v_bar (:obj:`float`): The default upper bound for linear velocity (reset after state estimation)
+        ~framerate (:obj:`float`): The camera image acquisition framerate, default is 30. fps
+        ~res_w (:obj:`int`): The desired width of the acquired image, default is 640px
+        ~res_h (:obj:`int`): The desired height of the acquired image, default is 480px
+
+    Subscribers:
+        ~apriltags_postprocessing_node/apriltags_out (:obj: `AprilTagsWithInfos`): Postprocessed AT
+        ~fsm_mode/mode (:obj: `FSMState`): The current state of the finite state machine
+        ~state_estimation/state (:obj: `Int16`): The number of stripes already encountered
+
+    Publishers:
+        ~random_april_tag_turns_node/turn_id_and_type (:obj: `TurnIDandType`): Turn command
+        ~wheels_driver_node/wheels_cmd (:obj: `WheelsCmdStamped`): Emergency zero velocity command
+        ~joy_mapper_node/joystick_override (:obj: `BoolStamped`): Deactivate autonomous driving (stop)
+        ~global_localization/estimator_trigger (:obj: `BoolStamped`): Start state_estimation or not
+
+    """
 
     def __init__(self, node_name):
-        # Initialize, specify 'node_name' further in 'if __name__ ...'
         super(LocalizationNode, self).__init__(node_name=node_name)
 
         # Initialize variables

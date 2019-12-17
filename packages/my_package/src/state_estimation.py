@@ -6,6 +6,7 @@
 # This script is called by the global_localization node from GOTO-1, and counts the number of midline stripes once the intersection navigation is done.
 # It acts as a state feedback mechanism (state = distance to final arrival point B). The global_localization node publishes a stop cmd when B is reached.
 
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
 
@@ -28,6 +29,30 @@ from cv_bridge import CvBridge
 
 # INITIATE DTROS CLASS (incl sub/pub)
 class StateEstimator(DTROS):
+    """Gives state feedback on number of midline stripes passed.
+
+    The node takes image stream from camera_node, crops it and applies a yellow mask filter,
+    according to a tunable frequency. It sums over the image, and counts the times a discontinuity
+    of yellow input is encountered (i.e. a midline stripe).
+
+    The configuration parameters can be passed from the terminal (in which case they will be activated
+    at only the right time) or can be changed during run-time using the 'rosparam set' cmd.
+
+    Configuration:
+        ~framerate (:obj:`float`): The camera image acquisition framerate, default is 30. fps
+        ~res_w (:obj:`int`): The desired width of the acquired image, default is 640px
+        ~res_h (:obj:`int`): The desired height of the acquired image, default is 480px
+        ~new_v_bar (:obj:`float`): The new upper bound on linear velocity during state estimation, default is 0.23
+
+    Subscribers:
+        ~camera_node/image/compressed (:obj: `CompressedImage`): The acquired images
+        ~global_localization/estimator_trigger (:obj: `BoolStamped`): Switch the state_estimation node on or off
+        ~fsm_mode/mode (:obj: `FSMState`): The current state of the finite state machine in `indefinite_navigation`
+
+    Publishers:
+        ~state_estimation/state (:obj: `Int16`): The number of stripes already encountered
+
+    """
 
     def __init__(self, node_name):
         super(StateEstimator, self).__init__(node_name=node_name)
@@ -59,7 +84,7 @@ class StateEstimator(DTROS):
         # Ensure optimal computation (e.g. lower/higher image resolution)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 25.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
         # Correct linear velocity for last mile state (only lane keeping)
         self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
 

@@ -17,11 +17,23 @@ import os
 import rospy
 
 
-# MAP SPECIFIC (CHANGE THIS IF MAP CHANGES)
+# INITIALIZE CLASS
 class PathPlanner:
+    """Returns shortest path from A to B in a given map.
 
+    The class takes a given starting point (from AT detection) and arrival point (from
+    terminal) and calculates the shortest path using Dijkstra as a sequence of AT's and
+    turn commands. The required graph representation of the used Duckietown configuration
+    is hardcoded in this class.
+
+    The arrival point can be passed from the terminal, while the class itself is called
+    (together with the passing of the starting point) by the `global_localization` node.
+
+    """
+
+# MAP SPECIFIC (CHANGE THIS IF MAP CHANGES)
     def __init__(self):
-        # List all AT id's (int32[] type) that are considered for localization purposes in the predefined map
+        # List all AT id's that are considered for localization in the predefined map
         # Add '0' to make the index of i refer to the i-th value from the python array
         self.tags = [0, 11, 61, 9, 199, 15, 8, 231, 66, 63, 59]
         self.number_of_tags = len(self.tags)
