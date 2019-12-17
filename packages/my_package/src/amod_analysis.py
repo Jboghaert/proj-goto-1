@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-# Search for TODO, or correct to see issues to be resolved
+
+# NOTE:
+# This is not part of the code for GOTO-1, but rather an additional project for time allocation analysis of indefinite_navigation,
+# and subsequent visualization of the results. This was at the time of the DEMO unfinished. If all relevant/main nodes are linked
+# to a specific state, we could simply subscribe to the FSM alone and time the different states (first cb function in this node).
+# Key is to select the states that are relevant and are as MECE as possible (no overlap, else ambiguity in the results).
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -24,13 +29,13 @@ from duckietown_msgs.msg import WheelsCmdStamped
 class AmodAnalyzer(DTROS):
 
     def __init__(self, node_name):
-        # Initialize, specify 'node_name' further in 'if __name__ ...'
         super(AmodAnalyzer, self).__init__(node_name=node_name)
 
         # Initialize variables (once)
         self.node_name = "state_estimation"
         self.veh_name = os.environ['VEHICLE_NAME']
 
+        # Initialize duration
         self.FSM_elapsed = 0
         self.Loc_elapsed = 0
         self.Vel_elapsed = 0
@@ -38,12 +43,7 @@ class AmodAnalyzer(DTROS):
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
-        # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
-        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
-        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
-
-        # List subscribers
+        # List subscribers (selection of indefinite_navigation nodes)
         self.sub_localization = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbLoc)
         self.sub_state_estimator = rospy.Subscriber('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, self.cbSE)
         self.sub_wheel_actuation = rospy.Subscriber('something' % self.veh_name, BoolStamped, self.cbVel)
@@ -51,11 +51,10 @@ class AmodAnalyzer(DTROS):
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
         self.rate = rospy.Rate(20)
-        self.bridge = CvBridge()
 
 
 # CODE GOES HERE
-
+    # Take cumulative duration of different FSMstates
     def cbFSM(self, FSMmsg):
         while FSMmsg == active:
             while FSMmsg.something == something:
@@ -81,7 +80,7 @@ class AmodAnalyzer(DTROS):
         else:
             pass
 
-
+    # Take cumulative duration of active localization_node (rather, publish to FSM and subscribe only to FSM)
     def cbLoc(self, Locmsg):
         while Locmsg == active:
             # Define locally

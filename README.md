@@ -215,3 +215,4 @@ As for any project, there are certain aspects of the GOTO-1 package and the invo
     - attach and tailor the .launch files for dt-core by again putting the value of `random_apriltag` to *false*,
     - execute this .launch file by including it in the original proj-goto-1.launch file,
     - **note**: this alternative was in the end not implemented, as the timeframe at the remaining time of development was limited and the (stable) implementation was only proved for `lane_following` and not yet for the larger `indefinite_navigation` module.
+- implementation of `duckietown-world` as basis for the Dijkstra graph, in order to switch more dynamically between various Duckietown configurations. For that, a mapping from the position of the AT's in the `dt-world` format to the format of the Dijkstra graph in the `path_planning_class` should be build.
