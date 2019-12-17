@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-# TITLE
-# SHORTEST PATH PLANNER GIVEN INPUT AT, PREDEFINED MAP AND COST FUNCTION (distance, #turns)
+# TITLE: SHORTEST PATH PLANNER GIVEN INPUT AT, PREDEFINED MAP AND COST FUNCTION (~ distance, #turns)
 
-# DESCRIPTION
-# This script is called by and takes input from localization_node and calculates the shortest path (in our predefined map) based on Dijkstra's Algorithm
-# It incorporates basic traffic rules, s.a. lane direction, no U-turns (see user scenario description of demo_map)
-# It also takes into account the distances AND the number of turns between nodes (AT's) as weights/scaled costs for the SSP problem.s
-# Output is a string of nodes (AT's) that the DB has to follow in order to get to the desired end point via the shortest path.
+# DESCRIPTION:
+# This script is called by and takes input from global_localization in GOTO-1 and calculates the shortest path (in our predefined map)
+# based on Dijkstra's Algorithm. It obeys basic traffic rules, s.a. lane direction and no U-turns (see user scenario description of map)
+# It also takes into account the distances AND the number of turns between nodes (AT's) as weights/scaled costs for the SSP problem.
+# Output is a sequence of AT's (nodes) the DB has to follow in order to get to the desired end point via the shortest path.
 
-# TODO:
-# Convert this to DTROS class based script, in order to use ros logging services
+# ----------------------------------------------------------------------------------------------------------------------------------------------------- #
+
 
 # IMPORT
 import numpy as np
@@ -18,22 +17,18 @@ import os
 import rospy
 
 
-# INITIATE DTROS CLASS (incl sub/pub)
+# MAP SPECIFIC (CHANGE THIS IF MAP CHANGES)
 class PathPlanner:
 
     def __init__(self):
-        # Use generated start and goal defined in localization_node
-
         # List all AT id's (int32[] type) that are considered for localization purposes in the predefined map
-        # the first '0' is useless just to make the index of i refer to the i-th value from the python array
+        # Add '0' to make the index of i refer to the i-th value from the python array
         self.tags = [0, 11, 61, 9, 199, 15, 8, 231, 66, 63, 59]
         self.number_of_tags = len(self.tags)
 
         iD = self.tags
 
-        # Define weights/costs between AT's to base SSP on - this is the predefined DT map (manual input)
-        # Each intersection has as many different AT's as it has roads (e.g. a T-intersection has 3 roads, and for each road another AT id)
-        # TODO: import as .yaml file from external source (have a map for each DT configuration, or configure from watchtowers)
+        # Define weights/costs between AT's to base SPP on - this is the predefined DT map (manual input)
         self.graph = {
             iD[1]: {iD[4]: 6.7, iD[9]: 8},
             iD[2]: {iD[5]: 2.7, iD[9]: 7.3},
@@ -48,7 +43,7 @@ class PathPlanner:
             iD[9]: {iD[7]: 8.4, iD[6]: 3.7},
             iD[10]: {iD[3]: 6.5, iD[6]: 2.9}}
 
-
+        # Define allowable turn commands between AT's to base SPP execution on
         self.graph_direction = {
             iD[1]: {iD[4]: 2, iD[9]: 0},
             iD[2]: {iD[5]: 0, iD[9]: 1},
@@ -64,6 +59,7 @@ class PathPlanner:
             iD[10]: {iD[3]: 1, iD[6]: 2}}
 
 
+# MAIN CODE (DO NOT CHANGE)
     def dijkstra(self, start, goal):
         # Set up
         shortest_distance = {}
@@ -73,7 +69,7 @@ class PathPlanner:
         cmd = []
         rospy.loginfo('Starting path planning, using Dijkstra ...')
 
-        # Algorithm
+        # Dijkstra algorithm
         for node in self.graph:
             shortest_distance[node] = infinity
         shortest_distance[start] = 0
@@ -107,9 +103,5 @@ class PathPlanner:
             rospy.loginfo('Shortest distance is ' + str(shortest_distance[goal]))
             rospy.loginfo('And the path is ' + str(path))
             rospy.loginfo('And the sequence of turn cmds is ' + str(cmd))
-            rospy.loginfo('... waiting for confirmation from path_planning module ...')
 
         return path, cmd
-        # WARNING: len(path) = (len(cmd) + 1) !!
-        # returns sequence of nodes in string format, this string will be the str-version of the AT id in int32 format
-        # this should allow easy calculation/transformation back and forth

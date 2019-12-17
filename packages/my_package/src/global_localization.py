@@ -50,7 +50,7 @@ class LocalizationNode(DTROS):
 
         # Related to state estimation
         self.estimation = False #start state estimation or not
-        self.arrival = False #destination reached or not
+        self.last_mile = False #destination reached or not
         self.stripe_length = (5. + 2.5) #stripe length in cm
 
         # Initialize logging services
@@ -104,19 +104,19 @@ class LocalizationNode(DTROS):
 
 # MAIN CODE
     def cbState(self, msg):
-        # Upon incoming msg, stop main callback by setting self.arrival = True
-        self.arrival = True
+        # Upon incoming msg, stop main callback by setting self.last_mile = True
+        self.last_mile = True
         rospy.Rate(30)
         rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
 
-        # Permanently subscribe to avoid AT cb during state_estimator from beginning, not only when final goal was reached
+        # Permanently subscribe (avoid AT callback) during state_estimation
         if msg.data >= self.goal_discrete:
             #stop DB
+            self.last_mile = False
             self.publishStop()
             rospy.loginfo('You have reached your destination')
             #stop StateEstimator
             self.estimation = False
-            self.arrival = False
             self.publishTrigger(self.estimation)
             #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
@@ -137,12 +137,12 @@ class LocalizationNode(DTROS):
 
     def callback(self, msg):
         # Check if state_estimation node is active
-        if self.arrival == False: #while?
+        if self.last_mile == False:
 
+            # Check with FSM state
             if self.fsm_mode == "INTERSECTION_CONTROL" or self.fsm_mode == "INTERSECTION_COORDINATION" or self.fsm_mode == "INTERSECTION_PLANNING":
-                # loop through list of april tags
 
-                rospy.loginfo('Incoming AprilTagsWithInfos msg, starting callback ...')
+                rospy.loginfo('Incoming AT, starting callback ...')
                 # filter out the nearest apriltag
                 dis_min = 999
                 idx_min = -1
@@ -156,38 +156,38 @@ class LocalizationNode(DTROS):
                             dis_min = distance
                             idx_min = idx
                         else:
-                            rospy.loginfo('What to do here: #1')
+                            rospy.loginfo('#1') #For inspection only
 
                     else:
-                        rospy.loginfo('What to do here: #2')
+                        rospy.loginfo('#2') #For inspection only
                         pass
 
                 # continue iff
                 if idx_min != -1:
                     taginfo = (msg.infos)[idx_min]
 
-                    # upon first AT - localize and generate path
+                    # Upon first AT - localize and generate path
                     if self.plan == True:
                         rospy.loginfo('Starting detection if AT is readible')
                         trigger, starting_point = self.detection(msg)
 
-                        if trigger == True: # detected AT is in list, use as starting point
-                            self.plan = False # don't come back here
+                        if trigger == True: #Detected AT is in list, valid starting point
+                            self.plan = False #Don't come back here
                             rospy.loginfo('Starting localization module ...')
-                            # Define path and cmd list after localization of AT if AT went through the above filter first
-                            # Save generated path and turn_cmd globally
+
+                            # Save generated path and turn cmds globally
                             path, self.cmd = self.pathPlanning(trigger, starting_point)
 
-                            # Take out the goal_input AT, which was only used to get all turn_cmds
-                            path.pop() # take out last AT entry (only necessary to calculate turn_cmds as it specified the final lane)
-                            self.full_path = path # fixed
-                            self.path = path # updated throughout script
+                            # Take out the goal_input AT (only used to get all turn_cmds and define final lane)
+                            path.pop()
+                            self.full_path = path #Fixate
+                            self.path = path #Update throughout script
 
-                            if len(self.path) > 1: #can be 1, since last AT is omitted from self.path
+                            if len(self.path) > 1: # Execute path
                                 turn_cmd = self.pathProcessor(self.path, self.cmd)
                                 self.publishCmd(turn_cmd)
 
-                            elif len(self.path) == 1: # Publish final turn command
+                            elif len(self.path) == 1: # Execute last mile
                                 turn_cmd = self.pathProcessor(self.path, self.cmd)
                                 self.publishCmd(turn_cmd)
                                 rospy.loginfo('Continue to StateEstimator after first AT')
@@ -195,25 +195,24 @@ class LocalizationNode(DTROS):
                                 time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
-                                self.arrival = True
-
+                                self.last_mile = True
 
                             else: # Stop immediately
-                                rospy.loginfo('Check this out: unexpected/unidentified behaviour #1')
+                                rospy.loginfo('Check this out: unidentified behaviour #1')
                                 self.publishStop()
 
-                    # upon all next AT's - execute generated path
+                    # Upon all next AT's - execute generated path
                     else:
-                        rospy.loginfo('Starting detection if next AT is next in path sequence')
                         trigger = self.executeFilter(msg)
 
                         if trigger == True: # detected AT is (next) in cmd list
                             rospy.loginfo('Starting execution module ...')
 
-                            if len(self.path) > 1:
+                            if len(self.path) > 1: # Execute path
                                 turn_cmd = self.pathProcessor(self.path, self.cmd)
                                 self.publishCmd(turn_cmd)
-                            elif len(self.path) == 1: # Publish final turn command
+
+                            elif len(self.path) == 1: # Execute last mile
                                 turn_cmd = self.pathProcessor(self.path, self.cmd)
                                 self.publishCmd(turn_cmd)
                                 rospy.loginfo('Continue to StateEstimator')
@@ -221,37 +220,37 @@ class LocalizationNode(DTROS):
                                 time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
-                                self.arrival = True
-
+                                self.last_mile = True
 
                             else: # Stop immediately
                                 rospy.loginfo('Check this out: unexpected/unidentified behaviour #2')
                                 self.publishStop()
 
                         else:
-                            rospy.loginfo('It is not')
-                            #rospy.loginfo('What to do here: #3')
+                            rospy.loginfo('#3') #For inspection only
                             pass
                 else:
-                    rospy.loginfo('What to do here: #4')
+                    rospy.loginfo('#4') #For inspection only
                     pass
         else:
-            rospy.loginfo('Encountered an AT while in state estimation, ignoring AT input')
+            rospy.loginfo('Ignore AT during state_estimation')
             pass
 
 
-    def detection(self, msg): # Process incoming msg from ~apriltags_out of type AprilTagsWithInfos
+    def detection(self, msg):
         for item in msg.detections:
-            if item.id in self.tags: #check if closest AT is localizable
+            # Check if closest AT is localizable
+            if item.id in self.tags:
                 self.AT = True
                 # Return usable input
                 starting_point = item.id
-                rospy.loginfo('Readible AT [%s] successfully detected, proceeding to correct module of localization/execution ...' %str(starting_point))
+                rospy.loginfo('Readible AT [%s] successfully detected, proceeding to localization/execution ...' %str(starting_point))
                 return self.AT, starting_point
             else:
                 self.AT = False
+                # Return usable input
                 outlying_point = item.id
-                rospy.loginfo('Incorrectly oriented AT [%s] detected, passing AT == False message (ignore) ...' %str(item.id))
+                rospy.loginfo('Unusable AT [%s] detected, ignore' %str(item.id))
                 return self.AT, outlying_point
 
 
@@ -260,40 +259,42 @@ class LocalizationNode(DTROS):
         #self.remaining = list(set(self.full_path).symmetric_difference(set(self.previous))) #update continuously = self.path
 
         for item in msg.detections:
-            if item.id in self.path: #check if AT has already been encountered
+            # Check if AT has already been encountered
+            if item.id in self.path:
                 rospy.loginfo('self.new_AT = True with id [%s]' %item.id)
                 self.new_AT = True
                 return self.new_AT
+            # Reached input AT unexpectedly, stop immediately (or replan)
             elif item.id == self.goal:
                 rospy.loginfo('self.new_AT = False with id [%s]' %item.id)
                 rospy.loginfo('We reached the final goal input node: stop now!')
                 self.publishStop()
                 self.new_AT = False
                 return self.new_AT
+            # AT is either unidentified (not in list), or in list but not in path anymore
             else:
-                # AT is either unidentified (not in list), or in list (but not in path anymore)
                 rospy.loginfo('self.new_AT = False with id [%s]' %item.id)
                 self.new_AT = False
                 return self.new_AT
 
 
-    def pathPlanning(self, AT, starting_point): # Calculate shortest path from current AT in time
+    def pathPlanning(self, AT, starting_point):
+        # Calculate shortest path from current AT in time
         if AT == True:
             rospy.loginfo('Starting path planning')
             # Define start and end point (dynamic)
             start = starting_point
             goal = self.goal
-            # Run path planning from imported class (defined in initializer)
+            # Run path_planning_class
             path, cmd = self.pp.dijkstra(start, goal)
-            rospy.loginfo('Confirmation: Path successfully generated ! With starting point the detected AT id %s' %str(start))
+            rospy.loginfo('Path successfully generated with starting point AT %s' %str(start))
             return path, cmd
         else:
-            rospy.loginfo('No usable AT detected, ignore message ... ')
+            rospy.loginfo('No usable AT detected, ignore')
 
 
     def pathProcessor(self, path, cmd):
-        # Take current node and command
-        # NOTE: since path and cmd are 'self.' defined, it is unnecessary to pass them as variables
+        # Take current node and command (note: inputs are also 'self.' defined)
         cmd_comb = [path[0], cmd[0]]
         # Set up outgoing message type
         new_cmd = TurnIDandType()
@@ -312,19 +313,22 @@ class LocalizationNode(DTROS):
 
 
     def publishCmd(self, new_cmd):
+        # Publish turn cmd
         self.pub_direction_cmd.publish(new_cmd)
-        #self.pub_turn_type.publish(new_cmd.turn_type)
-        rospy.loginfo("Published turn_cmd and turn_type")
+        rospy.loginfo("Published turn_cmd")
+
         # Once published, keep self.plan == False
         self.plan = False
         self.AT = False #unnecessary since self.plan already is False
-        # Update sequence (note: self.path updates itself!)
+
+        # Update sequence once published
         self.path.pop(0)
         self.cmd.pop(0)
         rospy.loginfo('Updated remaining path and cmd')
 
 
     def publishTrigger(self, bool):
+        # Pass trigger message
         triggerCmd = BoolStamped()
         triggerCmd.data = bool
         self.pub_state_estimator.publish(triggerCmd)
@@ -332,7 +336,7 @@ class LocalizationNode(DTROS):
 
 # REACHING FINAL POINT
     def publishStop(self):
-        # Produce wheel stopping cmd vel(0,0)
+        # Pass wheel stopping cmd (vel(0,0))
         stop_cmd = WheelsCmdStamped()
         stop_cmd.vel_left = 0.0
         stop_cmd.vel_right = 0.0
@@ -340,7 +344,7 @@ class LocalizationNode(DTROS):
         rospy.loginfo("Published stop_cmd")
 
     def publishJoy(self):
-        # see joy_mapper_node
+        # Pass override cmd (see joy_mapper_node)
         override = BoolStamped()
         override.data = True
         rospy.loginfo('override = True')
