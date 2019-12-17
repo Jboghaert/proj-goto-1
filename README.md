@@ -77,10 +77,13 @@ $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-duckiebot-interface:daffy
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-core:daffy
 ```
 
-Run the following the 
+Run the required demo containers (also outlined [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html)) and make sure no (old) `dt-core`, `dt-car-interface` or `dt-duckiebot-interface` are running. You could also manually start these demo containers from Portainer (accessed through *DUCKIEBOT_NAME.local:9000/#/containers* in a browser) if you already ran them before. Within Portainer, you will also be able to see the logging services of all containers running and inspect the DUCKIEBOT's behaviour. Now, run:
+```
+$ dts duckiebot demo --demo_name all_drivers --duckiebot_name DUCKIEBOT_NAME --package_name duckiebot_interface --image duckietown/dt-duckiebot-interface:daffy
+$ dts duckiebot demo --demo_name all --duckiebot_name DUCKIEBOT_NAME --package_name car_interface --image duckietown/dt-car-interface:daffy
+```
 
-
-As outlined in the command [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/Cmd.txt) in more detail, the demo container for `indefinite_navigation` is altered by excluding the node of `random_april_tags_turn_node`, and - in a next step - replacing it with the GOTO-1 nodes. The exclusion is done by entering the `indefinite_navigation.launch` file and putting the boolean value for the required node to *"false"*.
+As also outlined in the command [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/Cmd.txt) in more detail, the demo container for `indefinite_navigation` is altered by excluding the node of `random_april_tags_turn_node`, and - in a next step - replacing it with the GOTO-1 package. The exclusion is done by altering the `indefinite_navigation.launch` file and putting the boolean value of `random_apriltag` to *"false"* as follows:
 
 ```
 $ docker -H DUCKIEBOT_NAME.local run -it --name dt-core-goto1 -v /data:/data --privileged --rm --net host duckietown/dt-core:daffy /bin/bash
@@ -116,6 +119,12 @@ Then run the GOTO-1 module, and access its root to pass the desired input comman
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 $ roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_v_bar:="0.5" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
 ```
+
+Start the demo as follows, from another terminal:
+```
+$ dts duckiebot keyboard_control DUCKIEBOT_NAME
+```
+
 Once up and running, your ROS graph should display something like the image below.
 
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
@@ -124,10 +133,6 @@ Once up and running, your ROS graph should display something like the image belo
      <img src="media/ros_nodes.png" style='width: 20em'/>
 </div>
 
-Start the demo as follows, from another terminal:
-```
-$ dts duckiebot keyboard_control DUCKIEBOT_NAME
-```
 
 ## 4. Stopping procedure:
 When stopping the GOTO-1 module, do the following:
