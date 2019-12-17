@@ -55,7 +55,7 @@ class StateEstimator(DTROS):
 
 
         # DEMO SPECIFIC PARAMETER TUNING
-        # Ensure optimal computation (e.g. lower image resolution)
+        # Ensure optimal computation (e.g. lower/higher image resolution)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
         rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)

@@ -96,6 +96,10 @@ class LocalizationNode(DTROS):
         rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.66) #default = 0.66
         rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, 0.23) #default = 0.23
 
+        # Improve AT detection
+        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
+        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
+
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
