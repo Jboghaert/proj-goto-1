@@ -102,7 +102,7 @@ $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
 
 ## 3. Implementing GOTO-1
 
-Now build the image:
+Once the framework is set up, build the image:
 ```
 $ dts devel watchtower stop -H DUCKIEBOT_NAME.local
 $ chmod +x ./packages/my_package/src/localization_node.py
@@ -118,11 +118,17 @@ Once up and running, your ROS graph should display something like the image belo
 
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
 
-
-<div class="row">
-  <div class="column">
-    <img src="media/ros_nodes.png" alt="ros_nodes" style='width:100%'>
-  </div>
+<figure class="flow-subfigures">  
+    <figcaption>ROS graph of the global and state estimation node (red), with their respective subscribed topics (blue) and published topics (green)</figcaption>
+    <figure>
+        <figcaption>Global Localization (node)</figcaption>
+        <img style='width:8em' src="global_localization.png"/>
+    </figure>
+    <figure>  
+        <figcaption>State Estimation (node)</figcaption>
+        <img style='width:8em' src="state_estimation.png"/>
+    </figure>
+</figure>
 
 
 ## 4. Stopping procedure:
