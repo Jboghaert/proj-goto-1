@@ -42,6 +42,7 @@ class StateEstimator(DTROS):
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
+        self.bridge = CvBridge()
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
@@ -50,15 +51,15 @@ class StateEstimator(DTROS):
 
         # List publishers
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1)
-        self.pub_mask_compressed = rospy.Publisher('/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
-        self.pub_crop_compressed = rospy.Publisher('/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        #self.pub_mask_compressed = rospy.Publisher('/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+        #self.pub_crop_compressed = rospy.Publisher('/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
 
 
         # DEMO SPECIFIC PARAMETER TUNING
         # Ensure optimal computation (e.g. lower/higher image resolution)
         rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
         rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 20.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
         # Correct linear velocity for last mile state (only lane keeping)
         self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
 
@@ -66,7 +67,6 @@ class StateEstimator(DTROS):
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
         rospy.Rate(30)
-        self.bridge = CvBridge()
 
 
 # CODE GOES HERE
@@ -98,8 +98,6 @@ class StateEstimator(DTROS):
                 sum = self.imageSplitter(img)
                 # Count number of blobs (= midline stripes)
                 self.blobCounter(sum)
-                rospy.loginfo('Done #3')
-
             else:
                 pass
         else:
@@ -135,7 +133,7 @@ class StateEstimator(DTROS):
     def imageSplitter(self, img):
         # For inspection only
         img_crop_pub = img[8:10,:] #Further reduce image size
-        self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
+        #self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
         # Sum values
         img_crop_sum = np.sum(img_crop_pub)
@@ -154,11 +152,9 @@ class StateEstimator(DTROS):
                 self.number = self.number + 1
                 # Do not come back, unless fully black image (=line discontinuity) is encountered
                 self.go = False
-                # Give feedback
-                rospy.loginfo('Reached [-- %s --] stripes, encounting ...' % str(self.number))
+                #rospy.loginfo('Reached [-- %s --] stripes, encounting ...' % str(self.number))
                 self.pub_localization.publish(self.number)
             else:
-                rospy.loginfo('Check this out - unidentified behaviour')
                 pass
 
         # If black, reset trigger
@@ -170,6 +166,7 @@ class StateEstimator(DTROS):
 # SAFETY & EMERGENCY
     def on_shutdown(self):
         rospy.loginfo("[%s] Shutting down." % (self.node_name))
+        rospy.onShutdown()
 
 
 # KEEP NODE ALIVE

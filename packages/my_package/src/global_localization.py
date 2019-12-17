@@ -103,15 +103,14 @@ class LocalizationNode(DTROS):
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
-        rospy.Rate(20)
+        rospy.Rate(30)
 
 
 # MAIN CODE
     def cbState(self, msg):
         # Upon incoming msg, stop main callback by setting self.last_mile = True
         self.last_mile = True
-        rospy.Rate(30)
-        rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
+        rospy.loginfo('Reached [-- %s --] stripes, out of %s' %(msg.data, self.goal_discrete))
 
         # Permanently subscribe (avoid AT callback) during state_estimation
         if msg.data >= self.goal_discrete:
