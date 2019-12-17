@@ -132,6 +132,8 @@ When stopping the GOTO-1 module, do the following:
 `$ ssh DUCKIEBOT_NAME sudo poweroff`
 
 
+<!--IGNORE
+
 # Running GOTO-1
 Carefully follow the steps below to implement the proj-goto-1 solution onto your duckiebot.
 - [ ] Read the README.md file
@@ -140,6 +142,7 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 - [ ] Add any desired or necessary extensions to your operating system (s.a. dts shell, docker, ...)
 - [ ] Execute the cmd.txt file and change all DB dependent parameters if necessary (s.a. IP address and name)
 
+UNTIL HERE-->
 
 
 # Troubleshooting
@@ -155,3 +158,9 @@ As the existing framework of `indefinite_navigation` is not stable, and issues m
 Other helpful links:
 - issues regarding the set-up of your Duckiebot: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_troubleshooting.html#part:setup-troubleshooting)
 - issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
+
+
+# Future improvements
+As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
+- the AT detection could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's perpendicular to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
+- the state_estimation module should be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters.
