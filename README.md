@@ -16,7 +16,8 @@ The driving input to GOTO-1 are the intersection AT's, as these provide a reliab
 For the GOTO-1 project, certain limitations were set with respect to the localization, planning and execution of the *global localization* problem. I.e.:
 - the AT density within Duckietown should stay within reasonable limits and should ideally not exceed the already implemented AT's (s.a. stop signs, intersection signs, streetnames, ...)
 - no visual marks - other than the ones outlined [here](https://docs.duckietown.org/daffy/opmanual_duckietown/out/dt_ops_appearance_specifications.html) - can be used for initial localization, navigation and stopping of the Duckiebot
-
+- no U-turns are allowed within Duckietown - basic traffic rules should be taken into account
+- the Duckiebot should stay within the lanes, and should have the correct orientation (right lane driving direction)
 
 # Content & pipeline structure
 Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
@@ -30,15 +31,18 @@ Within the `packages/my_package/src` directory, all nodes and external classes f
 ## 1. Input parameters:
 Upon launching GOTO-1, the final arrival point B needs te be defined. In particular, two parameters have to be passed by the terminal, respectively defining the final lane and a point (distance) within that lane the Duckiebot should be in upon arrival:
 - `goal_input`: of type `tag_id`, this defines the final lane of the arrival point / the final lane the DB should be in upon Shutdown by specifying the AT id that is encountered at the end of that lane,
-- `goal_distance`: of type `int`, this specifies the distance between the last intersection the DB passes and the arrival point B,
+- `goal_distance`: of type `int`, this specifies the distance between the last intersection the DB passes and the arrival point B.
 
 All other values that can be passed from the terminal are tuning values to finetune the DB behaviour during `indefinite_navigation`. Default values for these parameters are defined in the `proj_goto_1.launch` [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch) of GOTO-1.
+
+Another necessary input that should be included - and be linked to your Duckietown configuration - is the Dijkstra graph representation of your Duckietown as well as a graph/mapping of the possible turn commands between nodes (AT's). An explanation is given [here] (**TODO!!**). See also the path_planning_class to see the implementation of this graph.
 
 ## 2. global_localization_node:
 This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of GOTO-1 and passes the desired turn commands per intersection, as well as the stop command upon arrival. The driving input of this code are the intersection AT's, serving as nodes for the Dijkstra graph within the `path_planning_class` outlined next.
 
 **Note:**
-The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
+- The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
+- The code currently features a switch `self.se_switch` that is *false* by default, in order to change between two state estimators (i.e. the state_estimation_node as explained next or a simple feedforward timer that calculates the time between last intersection and arrival point based on the current velocity parameters). The value of this switch can be changed dynamically upon running the node or during run-time from the terminal.
 
 ## 3. path_planning_class:
 This class is imported by `localization_node` and calculates the **shortest path** (SP) given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class, and should be adapted to the actual Duckietown you want to use.
@@ -149,7 +153,7 @@ When stopping the GOTO-1 module, do the following:
 ## 5. Additional:
 The following packages can be of further help to analyze (any) node or node-system:
 
-To see rqt graph (check if all connections are made):
+In order to see the ROS graph, to see what your Duckiebot sees or to use any rqt functionalities:
 ```
 $ dts start_gui_tools DUCKIEBOT_NAME
 ```
