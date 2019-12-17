@@ -83,10 +83,8 @@ class StateEstimator(DTROS):
 
 
     def cbCamera(self, img):
-        # Only start estimator once intersection navigation is over (inaccurate, as intersection navigation is a feedfwd cmd)
+        # Only start estimator once intersection navigation is over (inaccurate, as intersection navigation is a feedfwd cmd - needs more time)
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
-            # Allow more time to finish intersection navigation (tuned during testing)
-            time.sleep(3)
 
             # Only start if in last mile
             if self.estimator == True:

@@ -148,7 +148,7 @@ As the existing framework of `indefinite_navigation` is not stable, and issues m
 - the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal:
     - for calibrating `intersection_nagivation` see the file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
     - for calibrating `lane_following` see [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
-    - **note**: the kinematics_node gain affects both linear and angular velocity, so do not use this to tune linear velocity only
+    - **note**: the `kinematics_node/gain` parameter affects both linear and angular velocity, so preferably do not use this to tune linear velocity only
 - if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection:
     - intervene using the joystick controller
     - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...)
