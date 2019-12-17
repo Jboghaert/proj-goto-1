@@ -106,7 +106,7 @@ Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to clos
 $ roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
 ```
 
-**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted [here](#future_improvements), but yet implemented.
+**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#future_improvements), but not yet implemented.
 
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
