@@ -23,25 +23,25 @@ Within the `packages/my_package/src` directory, all nodes and external classes f
 
 **Legenda:** Unmarked inputs are given or self-determined, yellow blocks are running in the existing framework of `indefinite_navigation`, and orange/grey-marked items represent the custom blocks developed for GOTO-1.
 
-## 1. Input parameters
+## 1. Input parameters:
 Upon launching GOTO-1, the final arrival point B needs te be defined. In particular, two parameters have to be passed by the terminal, respectively defining the lane and a point (distance) within that lane:
 - `goal_input`: of type `tag_id`, this defines the final lane of the arrival point / the final lane the DB should be in upon Shutdown by specifying the AT id that is encountered at the end of that lane,
 - `goal_distance`: of type `int`, this specifies the distance between the last intersection the DB passes and the arrival point B,
 
 All other values that can be passed from the terminal are tuning values to finetune the DB behaviour during `indefinite_navigation`. Default values for these parameters are defined in the `proj_goto_1.launch` [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch) of GOTO-1.
 
-## 2. global_localization_node
+## 2. global_localization_node:
 This node **localizes** the duckiebot and uses an external path planning class to generate the **shortest path** to get from the localized point to a given destination point. It is the main code of GOTO-1 and passes the desired turn commands per intersection, as well as the stop command upon arrival. The driving input of this code are the intersection AT's, serving as nodes for the Dijkstra graph within the `path_planning_class` outlined next.
 
 **Note:**
 The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
 
-## 3. path_planning_class
+## 3. path_planning_class:
 This class is imported by `localization_node` and calculates the **shortest path** (SP) given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class, and should be adapted to the actual Duckietown you want to use.
 
 For the path planning, the class uses a Dijkstra algortihm to define. Dijkstra !! No U-turns allowed
 
-## 4. state_estimation_node
+## 4. state_estimation_node:
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
@@ -51,7 +51,7 @@ The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD)
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
 
-## 1. Prerequisites and assumptions
+## 1. Prerequisites and assumptions:
 The GOTO-1 package assumes the following assumptions within the Duckietown environment set-up:
 - DT map as hardcoded in `path_planning_class`,
 - no other AT's present as the ones hardcoded in `path_planning_class`,
@@ -65,7 +65,7 @@ In addition, in order to function properly and start using the ([daffy](https://
 - a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html).
 
 
-## 2. Setting up the framework
+## 2. Setting up the framework:
 Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through:
 ```
 $ ping DUCKIEBOT_NAME.local
@@ -76,6 +76,9 @@ $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-car-interface:daffy
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-duckiebot-interface:daffy
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-core:daffy
 ```
+
+Run the following the 
+
 
 As outlined in the command [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/Cmd.txt) in more detail, the demo container for `indefinite_navigation` is altered by excluding the node of `random_april_tags_turn_node`, and - in a next step - replacing it with the GOTO-1 nodes. The exclusion is done by entering the `indefinite_navigation.launch` file and putting the boolean value for the required node to *"false"*.
 
@@ -91,7 +94,7 @@ $ vim indefinite_navigation.launch
 ```
 Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to close and save the file. Then, launch the altered `indefinite_navigation`:
 ```
-$ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
+$ roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
 ```
 
 **Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation.
@@ -99,8 +102,7 @@ $ roslaunch duckietown_demos indefinite_navigation.launch veh:="maserati4pgts"
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
 
-
-## 3. Implementing GOTO-1
+## 3. Implementing GOTO-1:
 
 Once the framework is set up, build the image:
 ```
@@ -118,19 +120,45 @@ Once up and running, your ROS graph should display something like the image belo
 
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
 
-
 <div figure-id="ros_nodes">
      <img src="media/ros_nodes.png" style='width: 20em'/>
 </div>
 
+Start the demo as follows, from another terminal:
+```
+$ dts duckiebot keyboard_control DUCKIEBOT_NAME
+```
 
 ## 4. Stopping procedure:
 When stopping the GOTO-1 module, do the following:
 - close all auxiliary terminals you might have used (s.a. joystick control, start_gui_tools, rviz, ...),
-- stop all activated and created containers in portainer (accessed through *"DUCKIEBOT_NAME.local:9000/#/containers"*), wait for the processes to finish cleanly,
+- stop all activated and created containers in portainer (accessed through *DUCKIEBOT_NAME.local:9000/#/containers* in a browser), wait for the processes to finish cleanly,
 - ssh into your Duckiebot using the following command. Wait for 30 seconds before plugging out the battery.
 `$ ssh DUCKIEBOT_NAME sudo poweroff`
 
+
+## 5. Additional:
+The following packages can be of further help to analyze (any) node or node-system:
+
+To see rqt graph (check if all connections are made):
+`$ dts start_gui_tools DUCKIEBOT_NAME`
+Do one of the following:
+```
+$ rostopic list
+$ rosparam list
+$ rqt
+$ rqt_graph
+$ rqt_image_view
+```
+
+In order to dynamically adjust parameters (during run-time), start another container and pass parameters using /bin/bash as follows:
+`$ docker run -it --rm  -e ROS_MASTER_URI="http://DUCKIEBOT_IP:11311/" duckietown/dt-ros-commons:daffy-amd64 /bin/bash`
+Do the following:
+```
+$ rosparam list
+$ rosparam get /directory/path/file
+$ rosparam set /directory/path/file DESIRED_VALUE
+```
 
 <!--IGNORE
 
@@ -162,7 +190,7 @@ Other helpful links:
 
 # Future improvements
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
-- the AT detection could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
+- the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
 - the `intersection_navigation` parameters are currently passed as a feedforward command, and are not tailored a specific Duckiebot (developing a better feedback-based intersection navigation is currently part of another project),
 - the `lane_control` parameters are currently very unstable, and are again not tailored to a specific Duckiebot (developing a better adaptive lane control module is currently part of another project as well). During the development of GOTO-1, it was opted to do the next substeps. These should then allow to build an updated version of the dt-core, with the improved modules from the adaptive lane control project and the `random_apriltag` parameter as *false*.
