@@ -119,15 +119,15 @@ Once up and running, your ROS graph should display something like the image belo
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
 
 <figure class="flow-subfigures">  
-    <figcaption>ROS graph of the global and state estimation node (red), with their respective subscribed topics (blue) and published topics (green)</figcaption>
     <figure>
         <figcaption>Global Localization (node)</figcaption>
-        <img style='width:8em' src="media/global_localization.png"/>
+        <img style='width:4em' src="media/global_localization.png"/>
     </figure>
     <figure>  
         <figcaption>State Estimation (node)</figcaption>
-        <img style='width:8em' src="media/state_estimation.png"/>
+        <img style='width:4em' src="media/state_estimation.png"/>
     </figure>
+    <figcaption>ROS graph of the global and state estimation node (red), with their respective subscribed topics (blue) and published topics (green)</figcaption>
 </figure>
 
 
