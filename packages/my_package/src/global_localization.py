@@ -1,23 +1,12 @@
 #!/usr/bin/env python
-# Search for TODO, or correct to see issues to be resolved
 
-
-# TITLE: TRIGGER FUNCTION TO START LOCALIZATION? PATH PLANNING AND PUBLISH WHEEL CMD
+# TITLE: MAIN FUNCTION FOR GOTO-1: LOCALIZATION AND TURN CMD EXECUTION
 
 # DESCRIPTION:
 # This script takes input from apriltags_postprocessing_node and checks if a localizable AT (that is included in our predefined map) is reached
 # If so, it produces a usable input to the path_planning module for further processing and therefore acts as a switch, if not, AT_detection and lane_following continue
 # The path_planning module returns the shortest path and executable wheel commands that are then published to unicorn_intersection_node
 # If the final AT is reached, a state estimation function (listening to the camera_node topic) is started (issue: actions wrt. both subscribers are coupled)
-
-# TODO:
-# Include os.environ to automatically update DB name - make all parameters dynamic
-# Fix state state_estimation
-# Include analysis of AmOD
-# Include dynamic trim/gain tuner - include tune_file.txt
-# Include that when pressing S in joystick, the SE stops as well (as does the AT input)
-# Check for lag between camera and actual
-# Only do SE when not in self.state = intersection something
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -36,8 +25,6 @@ from duckietown_msgs.msg import BoolStamped, FSMState
 from std_msgs.msg import Int16
 from sensor_msgs.msg import CompressedImage
 from duckietown_msgs.msg import WheelsCmdStamped
-
-from sensor_msgs.msg import Joy
 
 from path_planning_class import PathPlanner
 
@@ -64,13 +51,13 @@ class LocalizationNode(DTROS):
 
         # Related to state estimation
         self.estimation = False #start state estimation or not
-        self.state = False #destination reached or not
+        self.arrival = False #destination reached or not
         self.stripe_length = (5. + 2.5) #stripe length in cm
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
 
-        # Get arrival point (from roslaunch/docker cmd setting the parameter 'goal_input' in terminal)
+        # Get arrival point B
         self.goal = rospy.get_param('/%s/goal_input' % self.node_name) # of type final AT id [int32]
         self.goal_distance = rospy.get_param('/%s/goal_distance' % self.node_name) # of type [distance after 2nd to last AT (actually take stopline)] in cm
         self.goal_discrete = int(self.goal_distance / self.stripe_length) + 2 # discretize length in cm to number of stripes, +2 to compensate view/delay for actual position
@@ -82,6 +69,17 @@ class LocalizationNode(DTROS):
         self.pp = PathPlanner()
         self.tags = self.pp.tags
         self.graph = self.pp.graph
+
+        # List subscribers
+        self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback)
+        self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
+        self.sub_state_estimator = rospy.Subscriber('/%s/state_estimation/state' % self.veh_name, Int16, self.cbState)
+
+        # List publishers
+        self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
+        self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
+        self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # stop the DB
+        self.pub_state_estimator = rospy.Publisher('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
 
 
         # DEMO SPECIFIC PARAMETER TUNING
@@ -100,19 +98,6 @@ class LocalizationNode(DTROS):
         rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, 0.23) #default = 0.23
 
 
-        # List subscribers
-        self.sub_AT_detection = rospy.Subscriber('/%s/apriltags_postprocessing_node/apriltags_out' %self.veh_name, AprilTagsWithInfos, self.callback) #from apriltags_postprocessing_node
-        self.sub_mode = rospy.Subscriber('/%s/fsm_node/mode' % self.veh_name, FSMState, self.cbMode, queue_size=1)
-        self.sub_state_estimator = rospy.Subscriber('/%s/state_estimation/state' % self.veh_name, Int16, self.cbState)
-
-        # List publishers
-        self.pub_direction_cmd = rospy.Publisher('/%s/random_april_tag_turns_node/turn_id_and_type' % self.veh_name, TurnIDandType, queue_size = 1) # to unicorn_intersection_node
-        self.pub_wheels_cmd = rospy.Publisher("/%s/wheels_driver_node/wheels_cmd" % self.veh_name, WheelsCmdStamped, queue_size = 1) # for emergency stop, else use onShutdown
-        self.pub_override_joystick = rospy.Publisher('/%s/joy_mapper_node/joystick_override' % self.veh_name, BoolStamped, queue_size = 1) # stop the DB (automated)
-        #self.pub_turn_type = rospy.Publisher("/%s/turn_type" % self.veh_name, Int16, queue_size=1) #unnecessary
-        self.pub_state_estimator = rospy.Publisher('/%s/global_localization/estimator_trigger' % self.veh_name, BoolStamped, queue_size = 1)
-        #self.pub_override_joystick = rospy.Publisher('/%s/joy' % self.veh_name, Joy, queue_size = 1) # necessary?
-
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
         rospy.Rate(20)
@@ -120,8 +105,8 @@ class LocalizationNode(DTROS):
 
 # CODE GOES HERE
     def cbState(self, msg):
-        # Upon incoming msg, stop main callback by setting self.state = True
-        self.state = True
+        # Upon incoming msg, stop main callback by setting self.arrival = True
+        self.arrival = True
         rospy.Rate(30)
         rospy.loginfo('We reached now %s stripes, out of %s' %(msg.data, self.goal_discrete))
 
@@ -132,7 +117,7 @@ class LocalizationNode(DTROS):
             rospy.loginfo('You have reached your destination')
             #stop StateEstimator
             self.estimation = False
-            self.state = False
+            self.arrival = False
             self.publishTrigger(self.estimation)
             #say goodbye
             rospy.loginfo('Thank you for driving with %s in Duckietown, enjoy your stay!' % self.veh_name)
@@ -153,7 +138,7 @@ class LocalizationNode(DTROS):
 
     def callback(self, msg):
         # Check if state_estimation node is active
-        if self.state == False: #while?
+        if self.arrival == False: #while?
 
             if self.fsm_mode == "INTERSECTION_CONTROL" or self.fsm_mode == "INTERSECTION_COORDINATION" or self.fsm_mode == "INTERSECTION_PLANNING":
                 # loop through list of april tags
@@ -211,7 +196,7 @@ class LocalizationNode(DTROS):
                                 time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
-                                self.state = True
+                                self.arrival = True
 
 
                             else: # Stop immediately
@@ -237,7 +222,7 @@ class LocalizationNode(DTROS):
                                 time.sleep(5)
                                 self.estimation = True
                                 self.publishTrigger(self.estimation)
-                                self.state = True
+                                self.arrival = True
 
 
                             else: # Stop immediately

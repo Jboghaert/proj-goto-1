@@ -125,6 +125,8 @@ class StateEstimator(DTROS):
     def colourConverter(self, img):
         # Convert BGR color of image to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        #imgHSV = img[400:410,0:400] #crop image for computation
+
         # Set boundaries (filter out exact HSV values for midline stripes)
         lower_yellow = np.array([29, 80, 180]) #np.uint8
         upper_yellow = np.array([33, 255, 255]) #np.uint8
