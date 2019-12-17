@@ -341,14 +341,15 @@ class LocalizationNode(DTROS):
 # REACHING FINAL POINT
     def publishStop(self):
         # Pass wheel stopping cmd (vel(0,0))
-        stop_cmd = WheelsCmdStamped()
-        stop_cmd.vel_left = 0.0
-        stop_cmd.vel_right = 0.0
-        self.pub_wheels_cmd.publish(stop_cmd)
-        rospy.loginfo("Published stop_cmd")
+        while True:
+            stop_cmd = WheelsCmdStamped()
+            stop_cmd.vel_left = 0.0
+            stop_cmd.vel_right = 0.0
+            self.pub_wheels_cmd.publish(stop_cmd)
+            rospy.loginfo("Published stop_cmd")
 
     def publishJoy(self):
-        # Pass override cmd (see joy_mapper_node)
+        # Pass override cmd (see joy_mapper_node) to stop DB when arrival point is reached
         override = BoolStamped()
         override.data = True
         rospy.loginfo('override = True')
