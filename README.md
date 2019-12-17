@@ -3,7 +3,7 @@
 </div>
 
 
-# Goal & Description
+# Goal & Description {#goto_1_description}
 Author: J. Boghaert
 
 Tutors: M. Hosner, G. Zardini
@@ -19,7 +19,7 @@ For the GOTO-1 project, certain limitations were set with respect to the localiz
 - no U-turns are allowed within Duckietown - basic traffic rules should be taken into account
 - the Duckiebot should stay within the lanes, and should have the correct orientation (right lane driving direction)
 
-# Content & pipeline structure
+# Content & pipeline structure {#goto_1_pipeline}
 Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
 
 <div figure-id="fig:pipeline_vis">
@@ -51,7 +51,7 @@ This class is imported by `localization_node` and calculates the **shortest path
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
-# Implementation
+# Implementation {#goto_1_implementation}
 The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros).
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
@@ -106,7 +106,7 @@ Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to clos
 $ roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
 ```
 
-**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#future_improvements), but not yet implemented.
+**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#goto_1_improvements), but not yet implemented.
 
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
@@ -188,7 +188,7 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 UNTIL HERE-->
 
 
-# Troubleshooting
+# Troubleshooting {#goto_1_troubleshooting}
 As the existing framework of `indefinite_navigation` is not stable, and issues may arise within the development branch of Duckietown (`daffy`), the following may be of help:
 - the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal:
     - for calibrating `intersection_nagivation` see the file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
@@ -203,7 +203,7 @@ Other helpful links:
 - issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
 
 
-# Future improvements {#future_improvements}
+# Future improvements {#goto_1_improvements}
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
 - the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
