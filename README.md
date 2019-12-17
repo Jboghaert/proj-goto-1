@@ -13,6 +13,10 @@ The goal of this project is to **navigate** a single Duckiebot within a predefin
 The driving input to GOTO-1 are the intersection AT's, as these provide a reliable (a certain AT will never return another AT id) and robust way to locate the Duckiebot in the city. This firstly originated from the need to have a certain landmark - mapped within a predefined map - that could serve as a localization tool. These then become - by extension - also the nodes for the subsequent path planning. In especially since the predefined map would already require to have all AT's mapped in order to allow localization from all possible starting points within the map. Also, using the AT's satisfies the constraint of not making U-turns within Duckietown. As a result, at each intersection an AT is read out and benchmarked/validated against the generated sequence of nodes composing the shortest path (note: the red stoplines at intersections could provide the trigger function for turn commands as well, but these proved to be less reliable during testing within the `indefinite_navigation` framework.) The in parallel to the node sequence generated sequence of turn commands then publishes the turn command to the `unicorn_intersection` node, which is responsible for the execution of intersection navigation and control. Once the final AT is encountered, the final turn command is passed and a state feedback loop takes over to go the last mile to the desired arrival point B. It passes a stop command once the distance from the last intersection (in number of midline stripes) is met.
 
 ## Restrictions
+For the GOTO-1 project, certain limitations were set with respect to the localization, planning and execution of the *global localization* problem. I.e.:
+- the AT density within Duckietown should stay within reasonable limits and should ideally not exceed the already implemented AT's (s.a. stop signs, intersection signs, streetnames, ...)
+- no visual marks - other than the ones outlined [here](https://docs.duckietown.org/daffy/opmanual_duckietown/out/dt_ops_appearance_specifications.html) - can be used for initial localization, navigation and stopping of the Duckiebot
+
 
 # Content & pipeline structure
 Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
@@ -24,7 +28,7 @@ Within the `packages/my_package/src` directory, all nodes and external classes f
 **Legenda:** Unmarked inputs are given or self-determined, yellow blocks are running in the existing framework of `indefinite_navigation`, and orange/grey-marked items represent the custom blocks developed for GOTO-1.
 
 ## 1. Input parameters:
-Upon launching GOTO-1, the final arrival point B needs te be defined. In particular, two parameters have to be passed by the terminal, respectively defining the lane and a point (distance) within that lane:
+Upon launching GOTO-1, the final arrival point B needs te be defined. In particular, two parameters have to be passed by the terminal, respectively defining the final lane and a point (distance) within that lane the Duckiebot should be in upon arrival:
 - `goal_input`: of type `tag_id`, this defines the final lane of the arrival point / the final lane the DB should be in upon Shutdown by specifying the AT id that is encountered at the end of that lane,
 - `goal_distance`: of type `int`, this specifies the distance between the last intersection the DB passes and the arrival point B,
 
@@ -146,7 +150,9 @@ When stopping the GOTO-1 module, do the following:
 The following packages can be of further help to analyze (any) node or node-system:
 
 To see rqt graph (check if all connections are made):
-`$ dts start_gui_tools DUCKIEBOT_NAME`
+```
+$ dts start_gui_tools DUCKIEBOT_NAME
+```
 Do one of the following:
 ```
 $ rostopic list
@@ -157,7 +163,9 @@ $ rqt_image_view
 ```
 
 In order to dynamically adjust parameters (during run-time), start another container and pass parameters using /bin/bash as follows:
-`$ docker run -it --rm  -e ROS_MASTER_URI="http://DUCKIEBOT_IP:11311/" duckietown/dt-ros-commons:daffy-amd64 /bin/bash`
+```
+$ docker run -it --rm  -e ROS_MASTER_URI="http://DUCKIEBOT_IP:11311/" duckietown/dt-ros-commons:daffy-amd64 /bin/bash
+```
 Do the following:
 ```
 $ rosparam list
