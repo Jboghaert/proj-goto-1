@@ -122,11 +122,11 @@ Once up and running, your ROS graph should display something like the image belo
     <figcaption>ROS graph of the global and state estimation node (red), with their respective subscribed topics (blue) and published topics (green)</figcaption>
     <figure>
         <figcaption>Global Localization (node)</figcaption>
-        <img style='width:8em' src="global_localization.png"/>
+        <img style='width:8em' src="media/global_localization.png"/>
     </figure>
     <figure>  
         <figcaption>State Estimation (node)</figcaption>
-        <img style='width:8em' src="state_estimation.png"/>
+        <img style='width:8em' src="media/state_estimation.png"/>
     </figure>
 </figure>
 
