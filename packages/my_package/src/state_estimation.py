@@ -85,11 +85,11 @@ class StateEstimator(DTROS):
     def cbCamera(self, img):
         # Only start estimator once intersection navigation is over (inaccurate, as intersection navigation is a feedfwd cmd)
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
+            # Allow more time to finish intersection navigation (tuned during testing)
+            time.sleep(3)
 
             # Only start if in last mile
             if self.estimator == True:
-                # Allow more time to finish intersection navigation (tuned during testing)
-                time.sleep(3)
                 # Only once in SE, limit linear velocity during last mile
                 rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
                 rospy.loginfo('Preparing image')
