@@ -3,10 +3,10 @@
 # TITLE: MAIN FUNCTION FOR GOTO-1: LOCALIZATION AND TURN CMD EXECUTION
 
 # DESCRIPTION:
-# This script takes input from apriltags_postprocessing_node and checks if a localizable AT (that is included in our predefined map) is reached
-# If so, it produces a usable input to the path_planning module for further processing and therefore acts as a switch, if not, AT_detection and lane_following continue
-# The path_planning module returns the shortest path and executable wheel commands that are then published to unicorn_intersection_node
-# If the final AT is reached, a state estimation function (listening to the camera_node topic) is started (issue: actions wrt. both subscribers are coupled)
+# This script takes input from apriltags_postprocessing_node and checks if a localizable AT (defined in predefined map) is reached
+# If so, it produces a usable input to the path_planning module for further processing and therefore acts as a switch, if not: continue indefinite navigation
+# The path_planning module returns the shortest path and executable wheel commands that are then published to unicorn_intersection_node when due
+# If the final AT is reached, a state_estimation node (sub to camera_node topic) is started
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -20,11 +20,10 @@ import time
 import math
 
 from duckietown import DTROS
-from duckietown_msgs.msg import AprilTagsWithInfos, TagInfo, AprilTagDetection, TurnIDandType
+from duckietown_msgs.msg import AprilTagsWithInfos, TurnIDandType
 from duckietown_msgs.msg import BoolStamped, FSMState
-from std_msgs.msg import Int16
-from sensor_msgs.msg import CompressedImage
 from duckietown_msgs.msg import WheelsCmdStamped
+from std_msgs.msg import Int16
 
 from path_planning_class import PathPlanner
 
@@ -103,7 +102,7 @@ class LocalizationNode(DTROS):
         rospy.Rate(20)
 
 
-# CODE GOES HERE
+# MAIN CODE
     def cbState(self, msg):
         # Upon incoming msg, stop main callback by setting self.arrival = True
         self.arrival = True

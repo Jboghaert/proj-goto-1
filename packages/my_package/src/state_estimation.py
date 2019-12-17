@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-# Search for TODO, or correct to see issues to be resolved
+
+# TITLE: AUXILIARY NODE FOR GOTO-1: STATE FEEDBACK, RESOLVING LAST MILE PROBLEM
+
+# DESCRIPTION:
+# This script is called by the global_localization node from GOTO-1, and counts the number of midline stripes once the intersection navigation is done.
+# It acts as a state feedback mechanism (state = distance to final arrival point B). The global_localization node publishes a stop cmd when B is reached.
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -13,11 +18,10 @@ import time
 import cv2
 
 from duckietown import DTROS
-from duckietown_msgs.msg import AprilTagsWithInfos, TagInfo, AprilTagDetection, TurnIDandType
 from duckietown_msgs.msg import BoolStamped, FSMState
+from duckietown_msgs.msg import WheelsCmdStamped
 from std_msgs.msg import Int16
 from sensor_msgs.msg import CompressedImage, Image
-from duckietown_msgs.msg import WheelsCmdStamped
 
 from cv_bridge import CvBridge
 
@@ -26,29 +30,18 @@ from cv_bridge import CvBridge
 class StateEstimator(DTROS):
 
     def __init__(self, node_name):
-        # Initialize, specify 'node_name' further in 'if __name__ ...'
         super(StateEstimator, self).__init__(node_name=node_name)
 
         # Initialize variables (once)
         self.node_name = "state_estimation"
         self.veh_name = os.environ['VEHICLE_NAME']
         self.number = 0
-        self.estimator = False # don't start this node unless 'True' from localization_node
-        self.go = False
-        self.fsm_mode = "INTERSECTION_CONTROL" #default, resolves issue if cbLocalization happens before cbMode
+        self.estimator = False #Don't start this node unless 'True' from global_localization
+        self.go = False #Start counting again
+        self.fsm_mode = "INTERSECTION_CONTROL" #Default, else false callback if cbLocalization happens before cbMode
 
         # Initialize logging services
         rospy.loginfo("[%s] Initializing." % (self.node_name))
-
-
-        # DEMO SPECIFIC PARAMETER TUNING
-        # Ensure optimal computation, rescale image (only once this node is started, so move this to a callback function)
-        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
-        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
-        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
-        # Correct param values from terminal for state_estimation (only lane keeping)
-        self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
-
 
         # List subscribers
         self.sub_camera_image = rospy.Subscriber('/%s/camera_node/image/compressed' % self.veh_name, CompressedImage, self.cbCamera) #from apriltags_postprocessing_node
@@ -59,6 +52,16 @@ class StateEstimator(DTROS):
         self.pub_localization = rospy.Publisher('/%s/state_estimation/state' %self.veh_name, Int16, queue_size = 1)
         self.pub_mask_compressed = rospy.Publisher('/%s/camera_node/mask/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
         self.pub_crop_compressed = rospy.Publisher('/%s/camera_node/crop/compressed' %self.veh_name, CompressedImage, queue_size = 1) #for inspection during testing
+
+
+        # DEMO SPECIFIC PARAMETER TUNING
+        # Ensure optimal computation (e.g. lower image resolution)
+        rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 640) # Default is 640px
+        rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 480) # Default is 480px
+        rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 18.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
+        # Correct linear velocity for last mile state (only lane keeping)
+        self.se_v_bar = rospy.get_param('/%s/new_v_bar' % self.node_name) # Default is 0.23
+
 
         # Conclude
         rospy.loginfo("[%s] Initialized." % (self.node_name))
@@ -74,28 +77,19 @@ class StateEstimator(DTROS):
 
 
     def cbLocalization(self, msg):
-        # Set trigger
+        # Set trigger (bool) to start cbCamera or not
         self.estimator = msg.data
         rospy.loginfo('Trigger = %s' %msg.data)
-        # WARNING: only update image here (else all camera feed for all nodes is of low quality)
-        # Ensure optimal computation, rescale image
-        #rospy.set_param('/%s/camera_node/res_w' % self.veh_name, 160) # Default is 640px
-        #rospy.set_param('/%s/camera_node/res_h' % self.veh_name, 120) # Default is 480px
-        #rospy.set_param('/%s/camera_node/framerate' % self.veh_name, 15.) # Minimum is 10-12 Hz (trade-off accuracy-computational power)
-
-        # Create timer to update params of camera_node
-        #rospy.Timer(rospy.Duration.from_sec(2.0), self.updateParams)
 
 
     def cbCamera(self, img):
-        # Only start estimator once intersection action is over
+        # Only start estimator once intersection navigation is over (inaccurate, as intersection navigation is a feedfwd cmd)
         if self.fsm_mode != "INTERSECTION_CONTROL" and self.fsm_mode != "INTERSECTION_COORDINATION" and self.fsm_mode != "INTERSECTION_PLANNING":
 
+            # Only start if in last mile
             if self.estimator == True:
                 # Only once in SE, limit linear velocity during last mile
-                # WARNING: do not change kinematics_node/gain, as this also affects the angular velocity
                 rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
-                #rospy.set_param('/%s/kinematics_node/gain' % self.veh_name, 0.55)
                 rospy.loginfo('Preparing image')
 
                 # Convert to OpenCV image in HSV
@@ -119,13 +113,14 @@ class StateEstimator(DTROS):
             return cv2_img
         except CvBridgeError as e:
             rospy.loginfo('Error encountered while converting image')
-            return [] #pass
+            return []
 
 
     def colourConverter(self, img):
-        # Convert BGR color of image to HSV
+        # Convert BGR to HSV
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        #imgHSV = img[400:410,0:400] #crop image for computation
+        # Crop image to reduce computation, take out noise from duckies on right side
+        imgHSV = img[400:410,0:400]
 
         # Set boundaries (filter out exact HSV values for midline stripes)
         lower_yellow = np.array([29, 80, 180]) #np.uint8
@@ -134,23 +129,21 @@ class StateEstimator(DTROS):
 
         # Output yellow/black image only
         result = cv2.bitwise_and(imgHSV, imgHSV, mask = mask_yellow)
-        self.pub_mask_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(result))
         return result
 
 
     def imageSplitter(self, img):
         # For inspection only
-        img_crop_pub = img[408:410,0:400] #lower image part
+        img_crop_pub = img[8:10,:] #Further reduce image size
         self.pub_crop_compressed.publish(self.bridge.cv2_to_compressed_imgmsg(img_crop_pub))
 
-        # Sum hsv values over a few px of lower image, take out noise from right side (duckies)
-        img_crop_sum = np.sum(img[408:410,0:400]) #lower image part
+        # Sum values
+        img_crop_sum = np.sum(img_crop_pub)
         return img_crop_sum
 
 
     def blobCounter(self, sum):
         self.current = sum
-        #rospy.loginfo('Done #3.1')
 
         # If not black (= yellow)
         if self.current != 0: # For robustness, increase threshold "if self.current > some_value":
@@ -161,11 +154,11 @@ class StateEstimator(DTROS):
                 self.number = self.number + 1
                 # Do not come back, unless fully black image (=line discontinuity) is encountered
                 self.go = False
+                # Give feedback
                 rospy.loginfo('Reached [-- %s --] stripes, encounting ...' % str(self.number))
                 self.pub_localization.publish(self.number)
             else:
-                #self.go = False
-                rospy.loginfo('Huh #1')
+                rospy.loginfo('Check this out - unidentified behaviour')
                 pass
 
         # If black, reset trigger
@@ -176,7 +169,6 @@ class StateEstimator(DTROS):
 
 # SAFETY & EMERGENCY
     def on_shutdown(self):
-        #self.number = 0
         rospy.loginfo("[%s] Shutting down." % (self.node_name))
 
 
