@@ -106,7 +106,7 @@ Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to clos
 $ roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
 ```
 
-**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation.
+**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted [here](#future_improvements), but yet implemented.
 
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
@@ -203,7 +203,7 @@ Other helpful links:
 - issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
 
 
-# Future improvements
+# Future improvements {#future_improvements}
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
 - the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
