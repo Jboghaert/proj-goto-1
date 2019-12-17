@@ -162,5 +162,13 @@ Other helpful links:
 
 # Future improvements
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
-- the AT detection could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's perpendicular to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
-- the state_estimation module should be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters.
+- the AT detection could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
+- the `state_estimation` module could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
+- the `intersection_navigation` parameters are currently passed as a feedforward command, and are not tailored a specific Duckiebot (developing a better feedback-based intersection navigation is currently part of another project),
+- the `lane_control` parameters are currently very unstable, and are again not tailored to a specific Duckiebot (developing a better adaptive lane control module is currently part of another project as well). During the development of GOTO-1, it was opted to do the next substeps. These should then allow to build an updated version of the dt-core, with the improved modules from the adaptive lane control project and the `random_apriltag` parameter as *false*.
+    - permanently fork the dt-core repository,
+    - change the base image of the GOTO-1 Dockerfile to dt-core (you want to build upon this image in order to be able to alter it, rather than the default dt-ros-commons image)
+    - attach the lane_control and line_detector packages developed in the `lane_control` project (AMOD 2019) by S. Arreghini and P. Griffa to the GOTO-1 repository,
+    - attach and tailor the .launch files for dt-core by again putting the value of `random_apriltag` to *false*,
+    - execute this .launch file by including it in the original proj-goto-1.launch file,
+    - **note**: this was in the end not implemented, as the timeframe was limited and the implementation was only proved for `lane_following` and not yet for the bigger `indefinite_navigation` module.
