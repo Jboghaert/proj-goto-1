@@ -88,6 +88,8 @@ class StateEstimator(DTROS):
 
             # Only start if in last mile
             if self.estimator == True:
+                # Allow more time to finish intersection navigation (tuned during testing)
+                time.sleep(3)
                 # Only once in SE, limit linear velocity during last mile
                 rospy.set_param('/%s/lane_controller_node/v_bar' % self.veh_name, self.se_v_bar)
                 rospy.loginfo('Preparing image')
