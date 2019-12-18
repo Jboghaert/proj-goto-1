@@ -298,8 +298,7 @@ class LocalizationNode(DTROS):
                 rospy.loginfo('self.new_AT = False with id [%s]' %item.id)
                 rospy.loginfo('We reached the final goal input node: stop now!')
                 self.publishStop()
-                self.new_AT = False
-                return self.new_AT
+                self.publishJoy()
             # AT is either unidentified (not in list), or in list but not in path anymore
             else:
                 rospy.loginfo('self.new_AT = False with id [%s]' %item.id)
