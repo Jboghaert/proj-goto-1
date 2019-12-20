@@ -4,9 +4,9 @@
 
 
 # Goal & Description {#goto_1_description}
-Author: J. Boghaert
+Author: [J. Boghaert](https://github.com/Jboghaert)
 
-Tutors: M. Hosner, G. Zardini
+Tutors: [M. Hosner](https://github.com/hosnerm), [G. Zardini](https://github.com/gzardini)
 
 The goal of this project is to **navigate** a single Duckiebot within a predefined Duckietown lay-out from **any starting point A** to a randomly generated **arrival point B**. The Duckiebot is - with GOTO-1 - able to start driving and autonomously navigate through Duckietown in such way that it uses the existing infrastructure only to localize and navigate, that it follows the shortest path possible and that it reaches the desired arrival point with an acceptable accuracy. This means that GOTO-1 uses existing, standard infrastructure as landmarks to locate itself within the city, and that it uses these landmarks as nodes to calculate the shortest path within the predefined Dijkstra graph representing Duckietown.
 
@@ -67,7 +67,7 @@ The GOTO-1 package assumes the following assumptions within the Duckietown envir
 
 In addition, in order to function properly and start using the ([daffy](https://docs.duckietown.org/daffy/index.html)) Duckietown-environment in the first place, GOTO-1 requires the following:
 - a well calibrated Duckiebot, i.e. using [wheel calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/wheel_calibration.html) and [camera calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/camera_calib.html),
-- a well set-up laptop (preferable Ubuntu), further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/laptop_setup.html),
+- a well set-up laptop (preferably Ubuntu), further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/laptop_setup.html),
 - a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html).
 
 
@@ -94,7 +94,7 @@ As also outlined in the command [file](https://github.com/duckietown-ethz/proj-g
 ```
 $ docker -H DUCKIEBOT_NAME.local run -it --name dt-core-goto1 -v /data:/data --privileged --rm --net host duckietown/dt-core:daffy /bin/bash
 ```
-Then, once inside the root, navigate to the `packages/duckietown_demos/launch` directory and then install the text editor *vim* to change the boolean value within the correct file.
+Then, once inside the root, navigate to the `packages/duckietown_demos/launch` directory and then install the text editor *vim* (or any other text editor) to change the boolean value within the correct file.
 ```
 $ cd packages/duckietown_demos/launch
 $ apt-get update
@@ -154,9 +154,7 @@ The following packages can be of further help to analyze (any) node or node-syst
 In order to see the ROS graph, to see what your Duckiebot sees or to use any rqt functionalities:
 ```
 $ dts start_gui_tools DUCKIEBOT_NAME
-```
-Do one of the following:
-```
+
 $ rostopic list
 $ rosparam list
 $ rqt
@@ -215,4 +213,4 @@ As for any project, there are certain aspects of the GOTO-1 package and the invo
     - attach and tailor the .launch files for dt-core by again putting the value of `random_apriltag` to *false*,
     - execute this .launch file by including it in the original proj-goto-1.launch file,
     - **note**: this alternative was in the end not implemented, as the timeframe at the remaining time of development was limited and the (stable) implementation was only proved for `lane_following` and not yet for the larger `indefinite_navigation` module.
-- implementation of `duckietown-world` as basis for the Dijkstra graph, in order to switch more dynamically between various Duckietown configurations. For that, a mapping from the position of the AT's in the `dt-world` format to the format of the Dijkstra graph in the `path_planning_class` should be build.
+- implementation of `duckietown-world` [repo](https://github.com/duckietown/duckietown-world) as basis for the Dijkstra graph, in order to switch more dynamically between various Duckietown configurations. For that, a mapping from the position of the AT's in the `dt-world` format to the format of the Dijkstra graph in the `path_planning_class` should be build.
