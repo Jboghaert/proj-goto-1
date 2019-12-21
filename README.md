@@ -220,7 +220,9 @@ The existing framework of `indefinite_navigation` was at the time of testing not
 - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...) such that there are no other AT's present as the ones hardcoded in `path_planning_class`
 
 
-**Other helpful links:**
+> **Symptom:** The set-up of the Duckiebot is incorrect (s.a. network problems, lost connection, blinking, ...) or more general problems with the `indefinite_navigation` framework:
+
+**Resolution:**
 - issues regarding the set-up of your Duckiebot: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_troubleshooting.html#part:setup-troubleshooting)
 - issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
 
