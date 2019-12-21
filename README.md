@@ -55,20 +55,20 @@ This class is imported by `localization_node` and calculates the **shortest path
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
 
 
-# Implementation {#goto_1_implementation}
+# Running GOTO-1 {#goto_1_implementation}
 The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros). Throughout this document `$ some command` refers to a command from the terminal within the project directory, and `# some command` refers to a command within the root of a Docker container (accessed using /bin/bash).
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
 A quick pre-flight checklist for the demo is provided below:
-- Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
-- Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
-- Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
-- Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
-- Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000/#/containers* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
-- Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
-- Check whether the ROS graph of the entire GOTO-1 module is correct using `rqt_graph` and use `rqt_image_view` to check whether the camera functions properly (further explained in section [Additional](#goto_1_implementation)).
-- Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
+1. Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
+    * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
+    * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
+2. Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
+3. Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000/#/containers* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
+4. Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
+    * Check whether the ROS graph of the entire GOTO-1 module is correct using `rqt_graph` and use `rqt_image_view` to check whether the camera functions properly (further explained in section [Additional](#goto_1_implementation)).
+5. Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
 
 
 ## 1. Prerequisites and assumptions:
