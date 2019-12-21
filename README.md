@@ -22,8 +22,8 @@ For the GOTO-1 project, certain limitations were set with respect to the localiz
 ## Teaser
 A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation of the Duckiebot, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown procedure of the GOTO-1 project.
 
-## Running the Demo version
-A quick pre-flight checklist for the demo is provided below:
+## Demo version
+A quick pre-flight checklist for running the GOTO-1 demo is provided below:
 - Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
     * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
     * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
@@ -215,9 +215,18 @@ The existing framework of `indefinite_navigation` was at the time of testing not
 
 > **Symptom:** There is a persisting tendency for the Duckiebot to not read out the correctly oriented AT at an intersection:
 
-**Resolution:**
+**Resolution:** Intervene manually or simplify the Duckietown lay-out and other restrictions:
 - intervene using the joystick controller
 - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...) such that there are no other AT's present as the ones hardcoded in `path_planning_class`
+
+
+> **Symptom:** State estimation does not function properly or a low accuracy of state feedback is encountered:
+
+**Resolution:** This requires finetuning of several parameters, but should be stable once a value exhibits well-functioning behaviour:
+- tune the camera frame rate in the `state_estimation` node (minimal values are given, but could be increased in order to be more precise in detecting midline stripe discontinuities)
+- tune the rospy rate used by the `global_localization` node and the `state_estimation` node to obtain an optimal processing of incoming camera images and passing of state feedback
+- tune the linear velocity `v_bar` of the `lane control` node (this can be passed upon starting the GOTO-1 package or dynamically via the `# rosparam set` command)
+- **note**: changing the above values is likely to have an influence on `lane_following` as well, for which other values might need to be tuned as well (see the first symptom).
 
 
 > **Symptom:** The set-up of the Duckiebot is incorrect (s.a. network problems, lost connection, blinking, ...) or more general problems with the `indefinite_navigation` framework:
