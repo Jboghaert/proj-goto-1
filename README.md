@@ -19,6 +19,9 @@ For the GOTO-1 project, certain limitations were set with respect to the localiz
 - no U-turns are allowed within Duckietown - basic traffic rules should be taken into account
 - the Duckiebot should stay within the lanes, and should have the correct orientation (right lane driving direction)
 
+## Teaser
+A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown.
+
 # Content & pipeline structure {#goto_1_pipeline}
 Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
 
@@ -106,7 +109,7 @@ Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to clos
 $ roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
 ```
 
-**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#goto_1_improvements), but not yet implemented.
+**Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#Future_improvements), but not yet implemented.
 
 **Important:** Keep the demo containers running at all times, and allow the containers enough time (about 3 minutes) to be up and running. Use a new terminal window for the next section(s).
 
