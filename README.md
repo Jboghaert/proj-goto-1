@@ -205,15 +205,17 @@ UNTIL HERE-->
 # Troubleshooting {#goto_1_troubleshooting}
 The existing framework of `indefinite_navigation` was at the time of testing not stable, and issues may arise within the development branch of Duckietown (`daffy`). Example videos of that can be found [here](https://drive.google.com/file/d/1UeRevwjQu62ARu0INYo6YaVFOHmZ3tOM/view) for AT detection where the Duckiebot is supposed to go straight but reads out an incorrectly oriented AT, [here](https://drive.google.com/file/d/1y1i8eiXv-RWP5j5Na8e2t8xoGfEP4eeL/view) for intersection navigation where the Duckiebot is supposed to take a left turn and [here](https://drive.google.com/file/d/1UkE1kg3MPbjpTgVxW5ECx_uzblhUJiCY/view) for lane following. In those cases, the following may be of help:
 
-> **Symptom:** something
+> **Symptom:** The Duckiebot does not navigate well at intersections (overshoot) and/or does not follow the lane smoothly:
+
 **Resolution:** the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal (or through the root of another running Docker container):
 - for calibrating `intersection_nagivation` see the file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
 - for calibrating `lane_following` see [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
-- **note**: the `kinematics_node/gain` parameter affects both linear and angular velocity, so preferably do not use this to tune linear velocity only
+- **note**: the `kinematics_node/gain` parameter affects both linear and angular velocity, so preferably do not use this when you want to tune only the linear velocity
 
 
-> **Symptom:** something
-**Resolution:** if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection:
+> **Symptom:** There is a persisting tendency for the Duckiebot to not read out the correctly oriented AT at an intersection:
+
+**Resolution:**
 - intervene using the joystick controller
 - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...) such that there are no other AT's present as the ones hardcoded in `path_planning_class`
 
