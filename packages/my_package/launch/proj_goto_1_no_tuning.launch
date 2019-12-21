@@ -1,0 +1,20 @@
+<launch>
+
+  <arg name="goal_input" default="231"/>
+  <arg name="goal_distance" default="40"/>
+  <arg name="new_gain" default="1"/>
+  <arg name="new_trim" default="1"/>
+
+  <group>
+    <node pkg="my_package" type="localization_node_test.py" name="localization_node_test" output="screen" args="$(arg goal_input) $(arg goal_distance) $(arg new_gain) $(arg new_trim)">
+      <param name="goal_input" type="int" value="$(arg goal_input)" />
+      <param name="goal_distance" type="int" value="$(arg goal_distance)" />
+      <param name="new_gain" type="int" value="$(arg new_gain)" />
+      <param name="new_trim" type="int" value="$(arg new_trim)" />
+    </node>
+
+    <node pkg="my_package" type="state_estimation.py" name="state_estimation" output="screen"/>
+    <node pkg="my_package" type="amod_analysis.py" name="amod_analysis" output="screen"/>
+  </group>
+
+</launch>

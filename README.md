@@ -35,17 +35,17 @@ Upon launching GOTO-1, the final arrival point B needs te be defined. In particu
 
 All other values that can be passed from the terminal are tuning values to finetune the DB behaviour during `indefinite_navigation`. Default values for these parameters are defined in the `proj_goto_1.launch` [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch) of GOTO-1.
 
-Another necessary input that should be included - and be linked to your Duckietown configuration - is the Dijkstra graph representation of your Duckietown as well as a graph/mapping of the possible turn commands between nodes (AT's). An explanation is given [here] (**TODO!!**). See also the `path_planning_class` to see the implementation of this graph.
+Another necessary input that should be included - and be linked to your Duckietown configuration - is the Dijkstra graph representation of your Duckietown as well as a graph/mapping of the possible turn commands between nodes (AT's). A more thorough explanation is given in the GOTO-1 [report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf). See also the `path_planning_class` to see the implementation of this graph.
 
 ## 2. global_localization_node:
 This node **localizes** the duckiebot and uses an external path planning class to generate the shortest path to get from the localized point to a given destination point. It is the main code of GOTO-1 and passes the desired turn commands per intersection, as well as the stop command upon arrival - i.e. it **navigates** through Duckietown. The driving input of this code are the intersection AT's, serving as nodes for the Dijkstra graph within the `path_planning_class` outlined next. Upon arrival, the node publishes a **stop command** and shuts down the GOTO-1 package.
 
 **Note:**
 - The code itself explains in- and output arguments, as well as additional, more detailed information on the exact approach and reasoning behind the code.
-- The code currently features a switch `self.se_switch` that is *false* by default, in order to change between two state estimators (i.e. the state_estimation_node as explained next or a simple feedforward timer that calculates the time between last intersection and arrival point based on the current velocity parameters). The value of this switch can be changed upon running the node or during run-time from the terminal using `$ rosparam set`.
+- The code currently features a switch `self.se_switch` that is *false* by default, in order to change between two state estimators (i.e. the state_estimation_node as explained next or a simple feedforward timer that calculates the time between last intersection and arrival point based on the current velocity parameters). The value of this switch can be changed upon running the node or during run-time from the terminal using `$ rosparam set`. Note however that the feedforward timer is not yet part of the package in this repository.
 
 ## 3. path_planning_class:
-This class is imported by `localization_node` and calculates the **shortest path** (SP) given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class, and should be adapted to the actual Duckietown you want to use. For the path planning itself, the class uses a Dijkstra algortihm to define the shortest path. It then gives a sequence of AT's (nodes) to define this path, as well as the corresponding turn commands it should execute in order to navigate/perform the shortest path.
+This class is imported by `localization_node` and calculates the **shortest path** (SP) given an input and output node within the predefined DT map. The predefined DT map is hardcoded in this class, and should be adapted to the actual Duckietown you want to use. For the path planning itself, the class uses a Dijkstra algorithm to define the shortest path. It then gives a sequence of AT's (nodes) to define this path, as well as the corresponding turn commands it should execute in order to navigate/perform the shortest path.
 
 ## 4. state_estimation_node:
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
@@ -59,7 +59,7 @@ Running the project should be implemented in the existing framework of `indefini
 
 ## 1. Prerequisites and assumptions:
 The GOTO-1 package assumes the following assumptions within the Duckietown environment set-up:
-- DT map as hardcoded in `path_planning_class`,
+- DT map as hardcoded in `path_planning_class` (the demo example can be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/lab_dt_map.png)),
 - no other AT's present as the ones hardcoded in `path_planning_class`,
 - no varying lighting conditions,
 - no external factors (s.a. obstacles on the roads),
