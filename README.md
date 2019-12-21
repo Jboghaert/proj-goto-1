@@ -22,6 +22,18 @@ For the GOTO-1 project, certain limitations were set with respect to the localiz
 ## Teaser
 A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation of the Duckiebot, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown procedure of the GOTO-1 project.
 
+## Running the Demo version
+A quick pre-flight checklist for the demo is provided below:
+- Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
+    * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
+    * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
+- Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
+- Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
+- Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
+    * Check whether the ROS graph of the entire GOTO-1 module is correct using `rqt_graph` and use `rqt_image_view` to check whether the camera functions properly (further explained in section [Additional](#goto_1_implementation)).
+- Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
+
+
 
 # Content & pipeline structure {#goto_1_pipeline}
 Within the `packages/my_package/src` directory, all nodes and external classes for the GOTO-1 project can be found. The figure below shows the overall pipeline of the project. It can be seen that the altered `indefinite_navigation` module is running all the time. In addition, the joystick controller is used to trigger and overrule the GOTO-1 modules whenever necessary.
@@ -59,16 +71,6 @@ This node executes the **last mile** problem of proj-goto-1 by converting the in
 The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros). Throughout this document `$ some_command` refers to a command from the terminal within the project directory, and `# some_command` refers to a command within the root of a Docker container (accessed using `/bin/bash`).
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
-
-A quick pre-flight checklist for the demo is provided below:
-- Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
-    * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
-    * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
-- Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
-- Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
-- Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
-    * Check whether the ROS graph of the entire GOTO-1 module is correct using `rqt_graph` and use `rqt_image_view` to check whether the camera functions properly (further explained in section [Additional](#goto_1_implementation)).
-- Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
 
 
 ## 1. Prerequisites and assumptions:
@@ -202,13 +204,16 @@ UNTIL HERE-->
 
 # Troubleshooting {#goto_1_troubleshooting}
 The existing framework of `indefinite_navigation` was at the time of testing not stable, and issues may arise within the development branch of Duckietown (`daffy`). Example videos of that can be found [here](https://drive.google.com/file/d/1UeRevwjQu62ARu0INYo6YaVFOHmZ3tOM/view) for AT detection where the Duckiebot is supposed to go straight but reads out an incorrectly oriented AT, [here](https://drive.google.com/file/d/1y1i8eiXv-RWP5j5Na8e2t8xoGfEP4eeL/view) for intersection navigation where the Duckiebot is supposed to take a left turn and [here](https://drive.google.com/file/d/1UkE1kg3MPbjpTgVxW5ECx_uzblhUJiCY/view) for lane following. In those cases, the following may be of help:
-- the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal (or through the root of another running Docker container):
-    - for calibrating `intersection_nagivation` see the file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
-    - for calibrating `lane_following` see [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
-    - **note**: the `kinematics_node/gain` parameter affects both linear and angular velocity, so preferably do not use this to tune linear velocity only
-- if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection:
-    - intervene using the joystick controller
-    - take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...) such that there are no other AT's present as the ones hardcoded in `path_planning_class`
+
+Symptom: something
+Resolution: the scripts for GOTO-1 can overrule the gain and trim values with new values passed through the command terminal (or through the root of another running Docker container):
+- for calibrating `intersection_nagivation` see the file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
+- for calibrating `lane_following` see [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/debug_intersection_navigation.pdf)
+- **note**: the `kinematics_node/gain` parameter affects both linear and angular velocity, so preferably do not use this to tune linear velocity only
+Symptom: something
+Resolution: if there is a persisting tendency for the Duckiebot to not read out the correct AT at an intersection:
+- intervene using the joystick controller
+- take out non-intersection sign AT's (s.a. STOP, ROAD_NAME, ...) such that there are no other AT's present as the ones hardcoded in `path_planning_class`
 
 
 Other helpful links:
