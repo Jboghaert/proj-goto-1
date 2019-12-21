@@ -56,19 +56,19 @@ This node executes the **last mile** problem of proj-goto-1 by converting the in
 
 
 # Running GOTO-1 {#goto_1_implementation}
-The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros). Throughout this document `$ some command` refers to a command from the terminal within the project directory, and `# some command` refers to a command within the root of a Docker container (accessed using /bin/bash).
+The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros). Throughout this document `$ some_command` refers to a command from the terminal within the project directory, and `# some_command` refers to a command within the root of a Docker container (accessed using `/bin/bash`).
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the indefinite navigation framework, which are outlined in the next sections.
 
 A quick pre-flight checklist for the demo is provided below:
-1. Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
+- Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
     * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
     * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/final_report.pdf)).
-2. Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
-3. Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000/#/containers* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
-4. Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
+- Set up the altered framework of the `indefinite navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
+- Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
+- Implement the GOTO-1 functionality on top of `indefinite navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
     * Check whether the ROS graph of the entire GOTO-1 module is correct using `rqt_graph` and use `rqt_image_view` to check whether the camera functions properly (further explained in section [Additional](#goto_1_implementation)).
-5. Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
+- Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
 
 
 ## 1. Prerequisites and assumptions:
@@ -79,45 +79,46 @@ The GOTO-1 package assumes the following assumptions within the Duckietown envir
 - an acceptably functioning `indefinite_navigation` demo version with ROS graph as attached.
 
 In addition, in order to function properly and start using the ([daffy](https://docs.duckietown.org/daffy/index.html)) Duckietown-environment in the first place, GOTO-1 requires the following:
-- a well calibrated Duckiebot, i.e. using [wheel calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/wheel_calibration.html) and [camera calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/camera_calib.html),
+- a well calibrated Duckiebot, i.e. using [wheel calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/wheel_calibration.html) and [camera calibration](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/camera_calib.html) (more [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/index.html)),
 - a well set-up laptop (preferably Ubuntu), further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/laptop_setup.html),
-- a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html).
+- a well established connection between Duckiebot and (any) desktop, further explained [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/setup_duckiebot.html),
+- a correctly set up Duckietown configuration (more info [here](https://docs.duckietown.org/daffy/opmanual_duckietown/out/dt_ops_assembly.html)).
 
 
 ## 2. Setting up the framework:
 Before building anything, make sure to be connected to your Duckiebot, and retrieve its IP address through:
-```
+~~~~
 $ ping DUCKIEBOT_NAME.local
-```
+~~~~
 Then, make sure to pull the latest docker images for `dt-core`, `dt-car-interface` and `dt-duckiebot-interface` through:
-```
+~~~~
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-car-interface:daffy
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-duckiebot-interface:daffy
 $ docker -H DUCKIEBOT_NAME.local pull duckietown/dt-core:daffy
-```
+~~~~
 
 Run the required demo containers (also outlined [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html)) and make sure no (old) `dt-core`, `dt-car-interface` or `dt-duckiebot-interface` are running. You could also manually start these demo containers from Portainer (accessed through *DUCKIEBOT_NAME.local:9000/#/containers* in a browser) if you already ran them before. Within Portainer, you will also be able to see the logging services of all containers running and inspect the DUCKIEBOT's behaviour. Now, run:
-```
+~~~~
 $ dts duckiebot demo --demo_name all_drivers --duckiebot_name DUCKIEBOT_NAME --package_name duckiebot_interface --image duckietown/dt-duckiebot-interface:daffy
 $ dts duckiebot demo --demo_name all --duckiebot_name DUCKIEBOT_NAME --package_name car_interface --image duckietown/dt-car-interface:daffy
-```
+~~~~
 
-As also outlined in the command [file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/Cmd.txt) in more detail, the demo container for `indefinite_navigation` is altered by excluding the node of `random_april_tags_turn_node`, and - in a next step - replacing it with the GOTO-1 package. The exclusion is done by altering the `indefinite_navigation.launch` file and putting the boolean value of `random_apriltag` to *"false"* as follows:
+As mentioned, the demo container for `indefinite_navigation` is altered by excluding the node of `random_april_tag_turns_node`, and - in a next step - replacing it with the GOTO-1 package. The exclusion is done by altering the `indefinite_navigation.launch` file and putting the boolean value of `random_apriltag` to *"false"* as follows:
 
-```
+~~~~
 $ docker -H DUCKIEBOT_NAME.local run -it --name dt-core-goto1 -v /data:/data --privileged --rm --net host duckietown/dt-core:daffy /bin/bash
-```
+~~~~
 Then, once inside the root, navigate to the `packages/duckietown_demos/launch` directory and then install the text editor *vim* (or any other text editor) to change the boolean value within the correct file.
-```
+~~~~
 # cd packages/duckietown_demos/launch
 # apt-get update
 # apt-get install vim
 # vim indefinite_navigation.launch
-```
+~~~~
 Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to close and save the file. Then, launch the altered `indefinite_navigation`:
-```
+~~~~
 # roslaunch duckietown_demos indefinite_navigation.launch veh:="DUCKIEBOT_NAME"
-```
+~~~~
 
 **Note:** The above procedure of installing vim should be performed every time when preparing the `indefinite_navigation` framework for the GOTO-1 implementation. An alternative approach was opted in section [Future Improvements](#goto_1_improvements), but not yet implemented.
 
@@ -127,22 +128,22 @@ Once inside the file, press *"i"* to edit, and `esc` followed by *":wq"* to clos
 ## 3. Implementing GOTO-1:
 
 Once the framework is set up, build the image:
-```
+~~~~
 $ dts devel watchtower stop -H DUCKIEBOT_NAME.local
 $ chmod +x ./packages/my_package/src/localization_node.py
 $ chmod +x ./packages/my_package/src/state_estimation.py
 $ dts devel build -f --arch arm32v7 -H DUCKIEBOT_NAME.local
-```
+~~~~
 Then run the GOTO-1 module, and access its root to pass the desired input commands:
-```
+~~~~
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 # roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_v_bar:="0.5" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
-```
+~~~~
 
 Start the demo as follows, from another terminal:
-```
+~~~~
 $ dts duckiebot keyboard_control DUCKIEBOT_NAME
-```
+~~~~
 
 Once up and running, your ROS graph should display something like the image below.
 
@@ -165,7 +166,7 @@ When stopping the GOTO-1 module, do the following:
 The following packages can be of further help to analyze (any) node or node-system:
 
 In order to see the ROS graph, to see what your Duckiebot sees or to use any rqt functionalities:
-```
+~~~~
 $ dts start_gui_tools DUCKIEBOT_NAME
 
 # rostopic list
@@ -173,18 +174,18 @@ $ dts start_gui_tools DUCKIEBOT_NAME
 # rqt
 # rqt_graph
 # rqt_image_view
-```
+~~~~
 
 In order to dynamically adjust parameters (during run-time), start another container and pass parameters using /bin/bash as follows:
-```
+~~~~
 $ docker run -it --rm  -e ROS_MASTER_URI="http://DUCKIEBOT_IP:11311/" duckietown/dt-ros-commons:daffy-amd64 /bin/bash
-```
+~~~~
 Do the following:
-```
+~~~~
 # rosparam list
 # rosparam get /directory/path/file
 # rosparam set /directory/path/file DESIRED_VALUE
-```
+~~~~
 
 <!--IGNORE
 
@@ -215,6 +216,7 @@ Other helpful links:
 - issues regarding the use of the `indefinite_navigation` framework: [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/trouble_unicorn_intersection.html)
 
 In general, sufficient time should be spent for tuning the parameter values of the Duckiebot. Note however, that a single success for a certain set of parameter values does not necessarily mean the values have converged and are optimal for all other trials.
+
 
 # Future improvements {#goto_1_improvements}
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
