@@ -8,7 +8,7 @@ Author: [J. Boghaert](https://github.com/Jboghaert)
 
 Tutors: [M. Hosner](https://github.com/hosnerm), [G. Zardini](https://github.com/gzardini)
 
-More information on the Global Localization problem can be found either in the [GOTO1.md file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/GOTO1.md) or more extensively in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view) of this Duckietown project, given in the Autonomous Mobility on Demand class at ETH Zürich, 2019.
+More information on the Global Localization problem can be found either in the [GOTO1.md file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/GOTO1.md) with a brief explanation on the pipeline and code packages in this repository or more extensively in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view) of this Duckietown project, given in the Autonomous Mobility on Demand class at ETH Zürich, 2019.
 
 # Teaser
 <!--{#goto_1_teaser}-->
