@@ -112,12 +112,15 @@ $ chmod +x ./packages/my_package/src/localization_node.py
 $ chmod +x ./packages/my_package/src/state_estimation.py
 $ dts devel build -f --arch arm32v7 -H DUCKIEBOT_NAME.local
 ~~~~
-Then run the GOTO-1 module, and access its root to pass the desired input commands:
+Then run the GOTO-1 module, and access its root to pass the desired input commands (change the values of these parameters):
 ~~~~
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
+# roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
+~~~~
+If you want to pass tuning values right away (these can always be changed later during runtime), use the following instead of the previous command (change the values to what suits your Duckiebot best):
+~~~~
 # roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40" new_v_bar:="0.5" inter_nav_ff_left:="0.4" inter_nav_ff_right:="-0.6" inter_nav_time_left_turn:="3.2" inter_nav_time_right_turn:="1.5"
 ~~~~
-
 Start the demo as follows, from another terminal:
 ~~~~
 $ dts duckiebot keyboard_control DUCKIEBOT_NAME
