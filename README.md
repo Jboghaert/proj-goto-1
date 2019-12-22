@@ -2,18 +2,21 @@
      <img src="media/header.png" style='width: 20em'/>
 </div>
 
-# General info {#goto_1_info}
+# General info
+<!--{#goto_1_info}-->
 Author: [J. Boghaert](https://github.com/Jboghaert)
 
 Tutors: [M. Hosner](https://github.com/hosnerm), [G. Zardini](https://github.com/gzardini)
 
 More information on the Global Localization problem can be found either in the [GOTO1.md file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/GOTO1.md) or more extensively in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view) of this Duckietown project, given in the Autonomous Mobility on Demand class at ETH Zürich, 2019.
 
-# Teaser {#goto_1_teaser}
+# Teaser
+<!--{#goto_1_teaser}-->
 A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation of the Duckiebot, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown procedure of the GOTO-1 project.
 
 
-# Duckietown set-up notes {#goto_1_set_up_notes}
+# Duckietown set-up notes
+<!--{#goto_1_set_up_notes}-->
 For the GOTO-1 project, any Duckietown configuration can be used that adheres to the [specifications](https://docs.duckietown.org/daffy/opmanual_duckietown/out/dt_ops_appearance_specifications.html). However, certain additional limitations were made in order for the localization, planning and execution of the *global localization* solution to make sense. These can be found under [Prerequisites and assumptions](#goto_1_implementation).
 
 <!-- GOTO-1 restrictions/limitations
@@ -24,7 +27,8 @@ For the GOTO-1 project, any Duckietown configuration can be used that adheres to
 -->
 
 
-# Demo pre-flight checklist {#goto_1_checklist}
+# Demo pre-flight checklist
+<!--{#goto_1_checklist}-->
 A quick pre-flight checklist for running the GOTO-1 demo is provided below:
 - Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
     * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
@@ -38,7 +42,8 @@ A quick pre-flight checklist for running the GOTO-1 demo is provided below:
 - Run the demo using the joystick controller, as explained in section [Implementing GOTO-1](#goto_1_implementation).
 
 
-# Demo instructions {#goto_1_implementation}
+# Demo instructions
+<!--{#goto_1_implementation}-->
 The scripts within the GOTO-1 project are written for the 2019 Duckietown (AMOD) class at ETH Zürich. The entire project is based on a ROS-template providing a boilerplate repository for developing ROS-based software in Duckietown, to be found [here](https://github.com/duckietown/template-ros). Throughout this document `$ some_command` refers to a command from the terminal within the project directory, and `# some_command` refers to a command within the root of a Docker container (accessed using `/bin/bash`). Also, make sure to replace `DUCKIEBOT_NAME` in every command with the name of your Duckiebot.
 
 Running the project should be implemented in the existing framework of `indefinite_navigation`, more info to be found [here](https://docs.duckietown.org/daffy/opmanual_duckiebot/out/demo_indefinite_navigation.html) with the default rosgraph to be found [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/indefinite_navigation_default_rosgraph.png). This framework allows us to comply with the Duckietown traffic rules, lane following and the necessary task prioritization of incoming commands. The implementation of the GOTO-1 project requires some changes to be made within the `indefinite_navigation` framework, which are outlined in the next sections.
@@ -122,7 +127,7 @@ Once up and running, your ROS graph should display something like the [ROS graph
 
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
 
-<!-->
+<!--
 <div figure-id="ros_nodes">
      <img src="media/ros_nodes.png" style='width: 20em'/>
 </div>
@@ -170,7 +175,8 @@ Carefully follow the steps below to implement the proj-goto-1 solution onto your
 UNTIL HERE-->
 
 
-# Troubleshooting {#goto_1_troubleshooting}
+# Troubleshooting
+<!--{#goto_1_troubleshooting}-->
 The existing framework of `indefinite_navigation` was at the time of testing not stable, and issues may arise within the development branch of Duckietown (`daffy`). Example videos of that can be found [here](https://drive.google.com/file/d/1UeRevwjQu62ARu0INYo6YaVFOHmZ3tOM/view) for AT detection where the Duckiebot is supposed to go straight but reads out an incorrectly oriented AT, [here](https://drive.google.com/file/d/1y1i8eiXv-RWP5j5Na8e2t8xoGfEP4eeL/view) for intersection navigation where the Duckiebot is supposed to take a left turn and [here](https://drive.google.com/file/d/1UkE1kg3MPbjpTgVxW5ECx_uzblhUJiCY/view) for lane following. In those cases, the following may be of help:
 
 > **Symptom:** The Duckiebot does not navigate well at intersections (overshoot) and/or does not follow the lane smoothly:
@@ -206,7 +212,8 @@ The existing framework of `indefinite_navigation` was at the time of testing not
 In general, sufficient time should be spent for tuning the parameter values of the Duckiebot. Note however, that a single success for a certain set of parameter values does not necessarily mean the values have converged and are optimal for all other trials.
 
 
-# GOTO-1 Improvements {#goto_1_improvements}
+# GOTO-1 Improvements
+<!--{#goto_1_improvements}-->
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
 - the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module and its accuracy could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
