@@ -32,7 +32,7 @@ For the GOTO-1 project, any Duckietown configuration can be used that adheres to
 A quick pre-flight checklist for running the GOTO-1 demo is provided below:
 - Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
     * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
-    * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view)).
+    * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view)). The current default, hardcoded Duckietown [configuration](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/lab_dt_map.png) is the one used for the final demo presentation of AMoD 2019 in room ML K31.
     * Additionaly, make sure your Duckiebot has a full battery before connecting or building anything.
 - Set up the altered framework of the `indefinite_navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
 - Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
