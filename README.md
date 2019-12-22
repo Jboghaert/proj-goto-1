@@ -53,7 +53,7 @@ This node executes the **last mile** problem of proj-goto-1 by converting the in
 
 
 
-# GOTO-1 demo {#goto_1_demo}
+# GOTO-1 Demo {#goto_1_demo}
 
 ## 1. Teaser  {#goto_1_teaser}
 A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation of the Duckiebot, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown procedure of the GOTO-1 project.
@@ -252,7 +252,7 @@ The existing framework of `indefinite_navigation` was at the time of testing not
 In general, sufficient time should be spent for tuning the parameter values of the Duckiebot. Note however, that a single success for a certain set of parameter values does not necessarily mean the values have converged and are optimal for all other trials.
 
 
-# GOTO-1 improvements {#goto_1_improvements}
+# GOTO-1 Improvements {#goto_1_improvements}
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
 - the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module and its accuracy could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
