@@ -112,7 +112,7 @@ $ chmod +x ./packages/my_package/src/localization_node.py
 $ chmod +x ./packages/my_package/src/state_estimation.py
 $ dts devel build -f --arch arm32v7 -H DUCKIEBOT_NAME.local
 ~~~~
-Then run the GOTO-1 module, and access its root to pass the desired input commands (change the values of these parameters):
+Then run the GOTO-1 module, and access its root to pass the desired input commands (more information on the different parameters can be found in the [GOTO1.md file](https://github.com/duckietown-ethz/proj-goto-1/blob/master/GOTO1.md)):
 ~~~~
 $ docker -H DUCKIEBOT_NAME.local run -it --name proj-goto-1 --privileged -v /data:/data -e ROS_MASTER_URI=http://DUCKIEBOT_IP:11311/ --rm --net host duckietown/IMAGE_NAME:IMAGE_TAG /bin/bash
 # roslaunch my_package proj_goto_1.launch goal_input:="199" goal_distance:="40"
