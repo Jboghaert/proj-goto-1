@@ -50,5 +50,3 @@ This class is imported by `localization_node` and calculates the **shortest path
 
 ## 4. state_estimation_node:
 This node executes the **last mile** problem of proj-goto-1 by converting the input distance (from a certain AT) to passing a desired number of midline stripes and visually counting these until the desired position is reached.
-
-
