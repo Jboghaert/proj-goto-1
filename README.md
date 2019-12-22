@@ -53,7 +53,7 @@ This node executes the **last mile** problem of proj-goto-1 by converting the in
 
 
 
-# Global localization demo {#goto_1_demo}
+# GOTO-1 demo {#goto_1_demo}
 
 ## 1. Teaser  {#goto_1_teaser}
 A successful run of the GOTO-1 demo version can be found [here](https://drive.google.com/file/d/1ceo435i2H9kbQmCQbiqCNoKmAQx5jAJe/view) for localization, path planning and navigation of the Duckiebot, and [here](https://drive.google.com/file/d/1__jHM4iRiDjxXo_UnNaNH6fftmc-62mf/view) for navigation, state estimation and shutdown procedure of the GOTO-1 project.
@@ -75,6 +75,7 @@ A quick pre-flight checklist for running the GOTO-1 demo is provided below:
 - Make sure all assumptions and restrictions for GOTO-1 as explained in [Prerequisites and assumptions](#goto_1_implementation) are met.
     * Set up the Duckiebot as explained in section [Prerequisites and assumptions](#goto_1_implementation).
     * Set up a correctly configured Duckietown as explained in section [Prerequisites and assumptions](#goto_1_implementation), and make sure the DT map is configured as in `path_planning_class` (more info can be found in the [final report](https://drive.google.com/file/d/16wffD6FrJ81WGrtCKoku1a_nmQv3DsbB/view)).
+    * Additionaly, make sure your Duckiebot has a full battery before connecting or building anything.
 - Set up the altered framework of the `indefinite_navigation` demo on which GOTO-1 will be built, as further explained in section [Setting up the framework](#goto_1_implementation).
 - Check if the activated Docker containers are visible in Portainer, accessed via *DUCKIEBOT_NAME.local:9000* (repeat this check after every newly run Docker container). Check if the containers are up and running by checking their log.
 - Implement the GOTO-1 functionality on top of `indefinite_navigation` as further explained in section [Implementing GOTO-1](#goto_1_implementation).
@@ -163,14 +164,15 @@ Start the demo as follows, from another terminal:
 $ dts duckiebot keyboard_control DUCKIEBOT_NAME
 ~~~~
 
-Once up and running, your ROS graph should display something like the image below.
+Once up and running, your ROS graph should display something like the [ROS graph](https://github.com/duckietown-ethz/proj-goto-1/blob/master/media/ros_nodes.png) attached.
 
 **Note:** All values have been assigned default values as defined in the `proj_goto_1.launch` file [here](https://github.com/duckietown-ethz/proj-goto-1/blob/master/packages/my_package/launch/proj_goto_1.launch). Although these give some useful behaviour and you could leave them out from the command, you are encouraged to find the most optimal trim values for your Duckiebot yourself.
 
+<!-->
 <div figure-id="ros_nodes">
      <img src="media/ros_nodes.png" style='width: 20em'/>
 </div>
-
+-->
 
 ### 4.4 Stopping procedure:
 When stopping the GOTO-1 module, do the following:
@@ -250,7 +252,7 @@ The existing framework of `indefinite_navigation` was at the time of testing not
 In general, sufficient time should be spent for tuning the parameter values of the Duckiebot. Note however, that a single success for a certain set of parameter values does not necessarily mean the values have converged and are optimal for all other trials.
 
 
-# Global localization improvements {#goto_1_improvements}
+# GOTO-1 improvements {#goto_1_improvements}
 As for any project, there are certain aspects of the GOTO-1 package and the involved framework of `indefinite_navigation` that can be improved. In especially, the following submodules could benefit from the following:
 - the `apriltag_detection` could make use of the AT pose in order to filter out only the correctly oriented AT's (as AT's parallel to the line of sight currently can be favoured over the ones that are perpendicular to the line of sight),
 - the `state_estimation` module and its accuracy could be improved by increasing the rate of analyzed frames, and lowering the upper bound for linear velocity (note that the latter also requires to finetune the other `lane_following` parameters,
